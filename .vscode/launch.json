@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(dev) Atol ",
+            "name": "(dev) PaySystem ",
             "request": "launch",
             "type": "dart",
             // "flutterMode": "debug",
-            "program": "./bin/atol_online_dart.dart",
+            "program": "./bin/PaySystem_online_dart.dart",
             // flutter run --enable-impeller
             "args": [
                 // "--profile"
@@ -20,11 +20,11 @@
             ]
         },
         {
-            "name": "(profile) Atol ",
+            "name": "(profile) PaySystem ",
             "request": "launch",
             "type": "dart",
             // "flutterMode": "debug",
-            "program": "./bin/atol_online_dart.dart",
+            "program": "./bin/PaySystem_online_dart.dart",
             // flutter run --enable-impeller
             "args": [
                 "--profile",
@@ -37,11 +37,11 @@
             ]
         },
         {
-            "name": "(release) Atol ",
+            "name": "(release) PaySystem ",
             "request": "launch",
             "type": "dart",
             // "flutterMode": "debug",
-            "program": "./bin/atol_online_dart.dart",
+            "program": "./bin/PaySystem_online_dart.dart",
             // flutter run --enable-impeller
             "args": [
                 "--release"
@@ -52,11 +52,11 @@
             ]
         },
         {
-            "name": "(dev) [DEMO] Atol",
+            "name": "(dev) [DEMO] PaySystem",
             "request": "launch",
             "type": "dart",
             // "flutterMode": "debug",
-            "program": "./lib/atol_online_dart.dart",
+            "program": "./lib/PaySystem_online_dart.dart",
             "args": [
                 // "--profile"
                 // "--enable-impeller"
@@ -66,12 +66,12 @@
             ]
         },
         // {
-        //     "name": "Atol (release)",
+        //     "name": "PaySystem (release)",
         //     "request": "launch",
         //     "type": "dart",
         //     // "flutterMode": "profile",
         //    // "flutterMode": "release",
-        //     "program": "./bin/atol_online_dart.dart",
+        //     "program": "./bin/PaySystem_online_dart.dart",
         //     "args": [
         //         // "--flavor",
         //         //  "dev",
