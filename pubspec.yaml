@@ -31,15 +31,15 @@ dependencies:
   shared_preferences: ^2.2.3
   uuid: ^3.0.7
 
-  pos_payment_terminal: 
-    path: ../ttk_dart-main
-  atol_online_dart: 
-    path: ../atol_online/atol_online_dart
+  pos_payment_terminal: any
+    # path: ../ttk_dart-main
+  atol_online_dart: any
+    # path: ../atol_online/atol_online_dart
 
   ## В этой папке вынесены все реальные авторизационные данные аккаунтов для тестирования оплаты, 
   ## в реальном приложении не используются, это можно удалить
-  test_data_folder: 
-    path: ../test_data_folder
+  # test_data_folder: 
+  #   path: ../test_data_folder
 
   sqlite3_flutter_libs: ^0.5.23
   # drift: ^2.18.0
