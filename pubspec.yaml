@@ -1,12 +1,18 @@
 name: web_and_terminal_pay
-description: "payment module from staff, "
+description: "payment module from staff"
 version: 1.0.0+1
-publish_to: 'none'
-
+repository: https://github.com/Taverz/web_and_terminal_pay
+homepage: https://github.com/Taverz/web_and_terminal_pay
+issue_trackerполе: https://github.com/Taverz/web_and_terminal_pay/issue
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
   # flutter: ">=1.17.0"
+
+platforms:
+  android:
+  ios:
+  windows:
 
 dependencies:
   
