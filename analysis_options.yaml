@@ -1,0 +1,16 @@
+# include: package:flutter_lints/flutter.yaml
+include: example/dart_code_metrics-5.7.6/lib/presets/all.yaml
+
+linter:
+  rules:
+    # Дополнительные правила линтинга или переопределение существующих
+    - avoid_print
+    - prefer_const_constructors
+
+dart_code_metrics:
+  metrics:
+    # Настройки порогов для метрик
+    cyclomatic-complexity: 10
+    lines-of-code: 80
+    maximum-nesting-level: 5
+    number-of-parameters: 4

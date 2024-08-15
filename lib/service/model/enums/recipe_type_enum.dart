@@ -1,0 +1,1 @@
+enum RecipeType { atol, yookassa }
