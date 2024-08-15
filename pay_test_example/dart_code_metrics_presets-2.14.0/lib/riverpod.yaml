@@ -1,9 +1,0 @@
-dart_code_metrics:
-  rules:
-    - avoid-ref-read-inside-build
-    - avoid-ref-watch-outside-build
-    - avoid-unnecessary-consumer-widgets
-    - use-ref-read-synchronously
-    - avoid-calling-notifier-members-inside-build
-    - avoid-notifier-constructors
-    - dispose-provided-instances

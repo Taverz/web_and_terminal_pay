@@ -1,3 +1,0 @@
-dart_code_metrics:
-  rules:
-    - avoid-async-callback-in-fake-async

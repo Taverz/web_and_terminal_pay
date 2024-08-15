@@ -11,6 +11,13 @@ pay_test_example/dds-2.5.0/pubspec.lock
 pay_test_example/pubspec.lock
 pubspec.lock
 
+
+pay_test_example/dart_code_metrics-5.7.6/
+pay_test_example/dart_code_metrics_presets-2.14.0/
+pay_test_example/dart_flutter_team_lints-2.1.1/
+pay_test_example/dart_style-2.3.6/
+pay_test_example/dds-2.5.0/
+
 ; # Исключить другие файлы и директории, которые не должны быть опубликованы
 ; *.iml
 ; *.lock
