@@ -50,7 +50,7 @@ class OperationPay {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _elapsed = Duration(seconds: _elapsed.inSeconds + 1);
-      _updateState(); // Update state
+      _updateState();
     });
   }
 
@@ -79,7 +79,7 @@ class OperationPay {
       _errorMessage = error.toString() + "\n" + "\n" + stackTrace.toString();
       _isLoading = false;
     }
-    _updateState(); // Update state
+    _updateState();
   }
 
   Future<void> startOperation() async {
@@ -89,7 +89,7 @@ class OperationPay {
     _isCanceled = false;
     _hasStarted = true;
     _elapsed = Duration.zero;
-    _updateState(); // Update state
+    _updateState();
     _startTimer();
 
     _cancelableOperation = CancelableOperation.fromFuture(
@@ -98,7 +98,7 @@ class OperationPay {
         _isLoading = false;
         _isCanceled = true;
         _stopTimer();
-        _updateState(); // Update state
+        _updateState();
       },
     );
 
@@ -115,7 +115,7 @@ class OperationPay {
     } finally {
       _isLoading = false;
       _stopTimer();
-      _updateState(); // Update state
+      _updateState();
     }
   }
 

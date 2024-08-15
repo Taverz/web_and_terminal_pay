@@ -26,6 +26,7 @@ class MultiPaymentPage extends StatefulWidget {
 class _MultiPaymentPageState extends State<MultiPaymentPage> {
   /// No real id
   final id = '123859';
+
   /// No real token
   final token = 'live_239dux823d23d023d283ujde';
   late final PaymentSystemMulti paymentSystemMulti;

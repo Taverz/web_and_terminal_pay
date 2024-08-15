@@ -1,8 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-
-import 'package:atol_online_dart/atol_online_v1_4/atol_online_v4.dart';
-import 'package:atol_online_dart/atol_online_v1_4/model/enum/payment_object.dart';
 import 'package:collection/collection.dart';
 import 'package:web_and_terminal_pay/pos/model/pay/send/send_pos_payment_model.dart';
 
