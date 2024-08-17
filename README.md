@@ -1,6 +1,26 @@
 
+### О плагине
+
+Предназначен для того чтобы проводить оплату через Юкассу (Yookassa - WEB) и Сбербанк/Сбер терминал(Sber/Sberbank) POS терминал KozenP12.    
+Плагин предназначен для организаций.  
+
 
 ## Features
+Чеки:
+- Выдача чека
+- Чек возврата
+Терминал:
+- Создание оплаты
+- Проверка статуса
+- Сверка итогов
+- Отмена оплаты
+- Возврат
+Веб оплата:
+- Вызов оплаты
+- Чек автоматически
+- Получение способов оплаты
+- Проверка статуса
+- Возврат
 
 
 
@@ -10,14 +30,5 @@
 ## Usage
 
 
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
 ## Additional information
 
-Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
