@@ -1,4 +1,4 @@
-import 'package:web_and_terminal_pay/pos/data/crud/crud.dart';
+import 'package:web_and_terminal_pay/crud/crud.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/yookassa_payment_model.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/refund/get/yookassa_refund_get_model.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/refund/post/yookassa_refund_post_model.dart';

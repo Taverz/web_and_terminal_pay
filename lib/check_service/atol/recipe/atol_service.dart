@@ -56,13 +56,14 @@ class AtolCheckService {
       throw Exception('No call auth() AtolOnlineV4');
     }
     try {
-      await _atolCheck!.createCheck(
+      await _atolCheck!.createCheckRefund(
         checkModel,
         (checkFromSave) {
-          checkSaveLocal.saveOneCheck(
-            mapCurrentCheck: checkFromSave.toMap(),
-            idCheck: checkFromSave.id,
-          );
+          //TODO:
+          // checkSaveLocal.saveOneCheck(
+          //   mapCurrentCheck: checkFromSave.toMap(),
+          //   idCheck: checkFromSave.id,
+          // );
         },
       );
       return true;

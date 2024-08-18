@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
 import 'package:web_and_terminal_pay/check_service/atol/recipe/check_save_repository.dart';
+import 'package:web_and_terminal_pay/crud/sharedpreference/crud_shared_preference.dart';
 import 'package:web_and_terminal_pay/pos/data/pos_local_db_impl.dart';
 
 import 'package:web_and_terminal_pay/service/payment_module_multi.dart';
@@ -38,7 +39,11 @@ class _MultiPaymentPageState extends State<MultiPaymentPage> {
     final dio = Dio();
     paymentSystemMulti = PaySystemWebAndTerminal(
       payTerminal: PaymentSberTerminalKozenP12(
-        sberLocalDB: SberLocalDB(),
+        sberLocalDB: SberLocalDB(
+          SharedPreferencesCRUD(),
+          SharedPreferencesCRUD(),
+          SharedPreferencesCRUD(),
+        ),
       ),
       payYookassa: YookassaRepository(
         YooKassaApi(

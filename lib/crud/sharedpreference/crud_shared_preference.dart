@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_and_terminal_pay/pos/data/crud/crud.dart';
+import 'package:web_and_terminal_pay/crud/crud.dart';
 
 class SharedPreferencesCRUD implements CRUDInterface {
   SharedPreferences? _prefs;
@@ -51,18 +51,18 @@ class SharedPreferencesCRUD implements CRUDInterface {
   }
 
   @override
-  Future<void> deleteElementFromMap(String mapKey) async {
+  Future<void> deleteMap() async {
     _ensureKeyIsSet();
     final currentMap = await getAllMap();
-    currentMap.remove(mapKey);
+    currentMap.remove(_key);
     await putMap(currentMap);
   }
 
   @override
-  Future<dynamic> getElementFromMap(String mapKey) async {
+  Future<dynamic> getElementFromMap() async {
     _ensureKeyIsSet();
     final currentMap = await getAllMap();
-    return currentMap[mapKey];
+    return currentMap[_key];
   }
 
   @override
@@ -96,7 +96,8 @@ class SharedPreferencesCRUD implements CRUDInterface {
   }
 
   @override
-  Future<void> setParameter(String key, dynamic value) async {
+  Future<void> setParameter(dynamic value) async {
+    final key = _key!;
     if (value is int) {
       await _prefs?.setInt(key, value);
     } else if (value is double) {
@@ -111,14 +112,15 @@ class SharedPreferencesCRUD implements CRUDInterface {
   }
 
   @override
-  Future<dynamic> getParameter(String key) async {
-    return _prefs?.get(key);
+  Future<dynamic> getParameter() async {
+    return _prefs?.get(_key!);
   }
 
   void _ensureKeyIsSet() {
     if (_key == null) {
       throw Exception(
-          "SharedPreferencesORM key is not initialized. Call init(key) first.");
+        "SharedPreferencesORM key is not initialized. Call init(key) first.",
+      );
     }
   }
 }
