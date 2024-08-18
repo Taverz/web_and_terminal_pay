@@ -7,8 +7,7 @@ import 'package:dio/dio.dart';
 //     "all_members_are_administrators": true
 // },
 class ApiTelegram {
-  static final String TOKEN_Telegram =
-      '75_yfU';
+  static final String TOKEN_Telegram = '75_yfU';
   // static String CHAT_ID_Telegram = '';
   // String createUrlMessagePUT(String textMessage) =>
   //     'https://api.telegram.org/bot$TOKEN_Telegram/sendMessage?chat_id=$CHAT_ID_Telegram&text=$textMessage';

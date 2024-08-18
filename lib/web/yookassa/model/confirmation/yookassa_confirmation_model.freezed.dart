@@ -21,11 +21,9 @@ YookassaConfirmationModel _$YookassaConfirmationModelFromJson(
 
 /// @nodoc
 mixin _$YookassaConfirmationModel {
-  YookassaConfirmationTypeEnum get type =>
-      throw _privateConstructorUsedError;
+  YookassaConfirmationTypeEnum get type => throw _privateConstructorUsedError;
   @JsonKey(name: 'confirmation_url')
-  String? get confirmationUrl =>
-      throw _privateConstructorUsedError;
+  String? get confirmationUrl => throw _privateConstructorUsedError;
   @JsonKey(name: 'return_url')
   String? get returnUrl => throw _privateConstructorUsedError;
 
@@ -200,10 +198,10 @@ abstract class _YookassaConfirmationModel implements YookassaConfirmationModel {
 
   @override
   YookassaConfirmationTypeEnum get type;
-  @override 
+  @override
   @JsonKey(name: 'confirmation_url')
   String? get confirmationUrl;
-  @override 
+  @override
   @JsonKey(name: 'return_url')
   String? get returnUrl;
   @override

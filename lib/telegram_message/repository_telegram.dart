@@ -5,15 +5,14 @@ class RepositoryTelegram {
   final ApiTelegram _apiTelegram;
   static String? CHAT_ID;
 
-  void initChatId(String CHAT_ID){
+  void initChatId(String CHAT_ID) {
     CHAT_ID = CHAT_ID;
   }
 
-  Future<void> sendMessage(String message) async{
-    if(CHAT_ID == null){
+  Future<void> sendMessage(String message) async {
+    if (CHAT_ID == null) {
       throw Exception('No init Chat, add Chat ID');
     }
     await _apiTelegram.sendMessage(message, CHAT_ID!);
   }
-
 }

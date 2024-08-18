@@ -245,7 +245,8 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     final result = await payTerminal.reconciliationOfResults();
     final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
     final dateTime = DateTime.now().toIso8601String();
-    final text = "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+    final text =
+        "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
     await repositoryTelegram.sendMessage(text);
   }
 }
