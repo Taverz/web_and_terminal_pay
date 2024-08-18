@@ -1,7 +1,8 @@
 import 'package:atol_online_dart/atol_online_v1_4/atol_online_v4.dart';
+import 'package:atol_online_dart/atol_online_v1_4/model/check_atol_entity.dart';
 import 'package:atol_online_dart/atol_online_v1_4/model/check_local_model.dart';
 import 'package:atol_online_dart/atol_online_v1_4/test_model/test_settings.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/check_save_repository.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/check_save_repository.dart';
 import 'package:atol_online_dart/atol_online_v1_4/model/refund_model.dart'
     as refund_model;
 
@@ -30,7 +31,7 @@ class AtolCheckService {
     }
   }
 
-  Future<bool> check(ModelSS checkModel) async {
+  Future<bool> check(CheckAtolEntity checkModel) async {
     if (_atolCheck == null) {
       throw Exception('No call auth() AtolOnlineV4');
     }
@@ -50,7 +51,7 @@ class AtolCheckService {
     }
   }
 
-  Future<bool> checkRefound(ModelSS checkModel) async {
+  Future<bool> checkRefound(CheckAtolEntity checkModel) async {
     if (_atolCheck == null) {
       throw Exception('No call auth() AtolOnlineV4');
     }
@@ -73,13 +74,13 @@ class AtolCheckService {
   Future<Map<String, CheckLocal>> getAllCheckToCycle() async {
     final data = await checkSaveLocal.getAllChecks();
     final dyn = Map<String, dynamic>.from(data);
-    // final convert = Map<String, ModelSS>.from(dyn);
-    // Convert to Map<String, ModelSS>
+    // final convert = Map<String, CheckAtolEntity>.from(dyn);
+    // Convert to Map<String, CheckAtolEntity>
     Map<String, CheckLocal> convert = dyn.map((key, value) {
       return MapEntry(key, CheckLocal.fromMap(value as Map<String, dynamic>));
     });
     return convert;
-    //data.map((key, value) => Map.from({ (key as int) : ModelSS.fromMap(value) }) ).cast();
+    //data.map((key, value) => Map.from({ (key as int) : CheckAtolEntity.fromMap(value) }) ).cast();
   }
 
   Future<void> clearCheck() async {

@@ -1,9 +1,9 @@
-import 'package:atol_online_dart/atol_online_v1_4/atol_online_v4.dart';
+import 'package:atol_online_dart/atol_online_v1_4/model/check_atol_entity.dart';
 import 'package:atol_online_dart/atol_online_v1_4/test_model/test_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/atol_service.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/check_save_repository.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/check_save_repository.dart';
 import 'package:web_and_terminal_pay/widgets/action_button_with_state.dart';
 import 'package:web_and_terminal_pay/widgets/check_atol/import_settings_page.dart';
 import 'package:web_and_terminal_pay/widgets/main_pages/hitsory_transaction.dart';
@@ -63,7 +63,7 @@ class _CheckSettingsPageState extends State<CheckSettingsPage> {
               initialText: 'Выдать чек',
               buttonText: 'Выдать чек',
               onPressed: () async {
-                final checkModel = ModelSS(
+                final checkModel = CheckAtolEntity(
                   idempotenceKeyERN: 'sdfd2id02i3md02i332',
                   emailClient: 'test@test.com',
                   phoneClient: null,
@@ -91,7 +91,7 @@ class _CheckSettingsPageState extends State<CheckSettingsPage> {
               initialText: 'Выдать чек возврата',
               buttonText: 'Выдать чек возврата',
               onPressed: () async {
-                final checkModel = ModelSS(
+                final checkModel = CheckAtolEntity(
                   idempotenceKeyERN: 'sdfd2id02i3md02i332',
                   emailClient: 'test@test.com',
                   phoneClient: null,

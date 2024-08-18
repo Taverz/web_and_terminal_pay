@@ -1,24 +1,28 @@
 import 'package:async/async.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/atol_service.dart';
-import 'package:web_and_terminal_pay/service/mapper/pay_system_mapper.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
+import 'package:web_and_terminal_pay/pos/data/mapper/pay_system_mapper.dart';
 
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/payment_methods.dart';
+import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/transaction_history.dart';
 import 'package:web_and_terminal_pay/pos/model/pay/get/get_pos_payment_model.dart';
 import 'package:web_and_terminal_pay/service/payment_module_multi.dart';
+import 'package:web_and_terminal_pay/telegram_message/repository_telegram.dart';
 import 'package:web_and_terminal_pay/web/yookassa/repository/yookassa_repository.dart';
 
 class PaySystemWebAndTerminal implements PaymentSystemMulti {
   final PayTerminal payTerminal;
   final YookassaRepository payYookassa;
   final AtolCheckService atolCheckService;
+  final RepositoryTelegram repositoryTelegram;
 
   PaySystemWebAndTerminal({
     required this.payTerminal,
     required this.payYookassa,
     required this.atolCheckService,
+    required this.repositoryTelegram,
   });
 
   // ignore: unused_field
@@ -34,6 +38,8 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     List<PaymentMethodEntity> paymentMethods = [
       PaymentMethodEntity.termianlSber
     ];
+    //TODO: CityCreek Chat ID
+    repositoryTelegram.initChatId('-11');
     final listYookassaMethods = convertYookassa(payMethods);
     paymentMethods.addAll(listYookassaMethods);
     _paymentMethods = paymentMethods;
@@ -216,7 +222,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   }
 
   @override
-  Future<bool> statusPay() async {
+  Future<PaymentStatusOperationEntity> statusPay() async {
     bool isPaid = false;
 
     if (_selectPaymentMethod != null &&
@@ -228,6 +234,18 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     } else {
       isPaid = false;
     }
-    return isPaid;
+    if (isPaid) {
+      return PaymentStatusOperationEntity.success;
+    }
+    return PaymentStatusOperationEntity.error;
+  }
+
+  @override
+  Future<void> closingShift() async {
+    final result = await payTerminal.reconciliationOfResults();
+    final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+    final dateTime = DateTime.now().toIso8601String();
+    final text = "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+    await repositoryTelegram.sendMessage(text);
   }
 }

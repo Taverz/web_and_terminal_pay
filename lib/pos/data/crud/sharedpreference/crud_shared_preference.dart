@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_and_terminal_pay/service/crud/crud.dart';
+import 'package:web_and_terminal_pay/pos/data/crud/crud.dart';
 
 class SharedPreferencesCRUD implements CRUDInterface {
   SharedPreferences? _prefs;

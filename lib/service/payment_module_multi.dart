@@ -1,13 +1,16 @@
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
+import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
+import 'package:web_and_terminal_pay/service/entity/transaction_history.dart';
+import 'package:web_and_terminal_pay/service/payment_module.dart';
 
-abstract class PaymentSystemMulti {
+abstract class PaymentSystemMulti implements PaymentSystem {
   Future<void> init();
   Future<bool> pay(PayEntity paymentModel);
-  Future<bool> statusPay();
+  Future<PaymentStatusOperationEntity> statusPay();
 
   /// Прекрытить оплату / Отменить оплату
   Future<void> abortPay();
-  Future<void> getHistoryTransaction();
+  Future<TransactionHistory> getHistoryTransaction();
   Future<void> refound();
   Future<List> getPaymentMethods();
 
@@ -15,7 +18,7 @@ abstract class PaymentSystemMulti {
   Future<void> selectPaymentMethod(int index);
 
   /// Закрытие смены
-  // Future<void> closingShift();
+  Future<void> closingShift();
 
   /// Закрыть стримы и порчее ...
   Future<void> close();

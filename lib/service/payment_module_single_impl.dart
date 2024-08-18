@@ -1,17 +1,22 @@
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/atol_service.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
+import 'package:web_and_terminal_pay/service/entity/extension_pay_sber.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/payment_methods.dart';
+import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/transaction_history.dart';
 import 'package:web_and_terminal_pay/service/payment_module_single.dart';
+import 'package:web_and_terminal_pay/telegram_message/repository_telegram.dart';
 
 class PaySystemTerminal implements PaymentSystemSingle {
   // PaymentSberTerminalKozenP12
   final PayTerminal payTerminal;
   final AtolCheckService atolCheckService;
+  final RepositoryTelegram repositoryTelegram;
   PaySystemTerminal({
     required this.payTerminal,
     required this.atolCheckService,
+    required this.repositoryTelegram,
   });
 
   PayEntity? _paymentModel;
@@ -23,6 +28,8 @@ class PaySystemTerminal implements PaymentSystemSingle {
   Future<void> init() async {
     _paymentModel = null;
     await payTerminal.init();
+    //TODO: CityCreek Chat ID
+    repositoryTelegram.initChatId('-11');
   }
 
   @override
@@ -39,7 +46,11 @@ class PaySystemTerminal implements PaymentSystemSingle {
 
   @override
   Future<void> closingShift() async {
-    await payTerminal.reconciliationOfResults();
+    final result = await payTerminal.reconciliationOfResults();
+    final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+    final dateTime = DateTime.now().toIso8601String();
+    final text = "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+    await repositoryTelegram.sendMessage(text);
   }
 
   @override
@@ -99,5 +110,16 @@ class PaySystemTerminal implements PaymentSystemSingle {
       throw Exception('Empty list pay methods');
     }
     _selectPaymentMethod = _paymentMethods![index];
+  }
+
+  @override
+  Future<PaymentStatusOperationEntity> statusPay() async {
+    if (_paymentModel == null) {
+      throw Exception('No pay create');
+    }
+    final statusString = await payTerminal.checkStatusCurrentOperation();
+    final status =
+        PaymentStatusOperationEntity.convertTerminal_StringToEnum(statusString);
+    return status;
   }
 }

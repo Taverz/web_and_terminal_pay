@@ -38,16 +38,16 @@ dependencies:
   web_and_terminal_pay:
     path: ../
   
-  dds:
-    path: dds-2.5.0
-  dart_style:
-    path: dart_style-2.3.6
-  dart_flutter_team_lints:
-    path: dart_flutter_team_lints-2.1.1
-  dart_code_metrics:
-    path: dart_code_metrics-5.7.6
-  dart_code_metrics_presets:
-    path: dart_code_metrics_presets-2.14.0
+  # dds:
+  #   path: dds-2.5.0
+  # dart_style:
+  #   path: dart_style-2.3.6
+  # dart_flutter_team_lints:
+  #   path: dart_flutter_team_lints-2.1.1
+  # dart_code_metrics:
+  #   path: dart_code_metrics-5.7.6
+  # dart_code_metrics_presets:
+  #   path: dart_code_metrics_presets-2.14.0
 
   ## В этой папке вынесены все реальные авторизационные данные аккаунтов для тестирования оплаты, 
   ## в реальном приложении не используются, это можно удалить

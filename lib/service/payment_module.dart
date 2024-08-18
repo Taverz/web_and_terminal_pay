@@ -1,9 +1,8 @@
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/transaction_history.dart';
-import 'package:web_and_terminal_pay/service/payment_module.dart';
 
-abstract class PaymentSystemSingle implements PaymentSystem {
+abstract class PaymentSystem {
   Future<void> init();
   Future<void> pay(PayEntity paymentModel);
   Future<PaymentStatusOperationEntity> statusPay();

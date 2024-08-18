@@ -6,7 +6,7 @@ import 'package:web_and_terminal_pay/web/yookassa/model/amount/yookassa_amount_m
 import 'package:web_and_terminal_pay/web/yookassa/model/yookassa_payment_model.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/refund/get/yookassa_refund_get_model.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/refund/post/yookassa_refund_post_model.dart';
-import 'package:web_and_terminal_pay/web/yookassa/repository/local_save_yookassa.dart';
+import 'package:web_and_terminal_pay/web/yookassa/data/local_save_yookassa.dart';
 
 import 'package:web_and_terminal_pay/web/yookassa/data/yookassa_api.dart';
 import 'package:uuid/uuid.dart';
