@@ -25,11 +25,10 @@ class PaySystemTerminal implements PaymentSystemSingle {
   PaymentMethodEntity? _selectPaymentMethod;
 
   @override
-  Future<void> init() async {
+  Future<void> init({String? Chat_ID}) async {
     _paymentModel = null;
     await payTerminal.init();
-    //TODO: CityCreek Chat ID
-    repositoryTelegram.initChatId('-11');
+    repositoryTelegram.initChatId(Chat_ID);
   }
 
   @override
@@ -42,16 +41,6 @@ class PaySystemTerminal implements PaymentSystemSingle {
   Future<void> close() async {
     _paymentModel = null;
     await payTerminal.close();
-  }
-
-  @override
-  Future<void> closingShift() async {
-    final result = await payTerminal.reconciliationOfResults();
-    final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
-    final dateTime = DateTime.now().toIso8601String();
-    final text =
-        "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
-    await repositoryTelegram.sendMessage(text);
   }
 
   @override
@@ -76,13 +65,18 @@ class PaySystemTerminal implements PaymentSystemSingle {
   }
 
   @override
-  Future<void> pay(PayEntity paymentModel) async {
+  Future<PaymentStatusOperationEntity> pay(
+    PayEntity paymentModel, {
+    String? organizationsSelect,
+  }) async {
     _paymentModel = paymentModel;
     try {
       await payTerminal.createPay(_paymentModel!.payModelSberTerminal());
       await atolCheckService.check(_paymentModel!.checkModelAtol());
+      return PaymentStatusOperationEntity.success;
       //TODO: transaction save
     } catch (e) {
+      return PaymentStatusOperationEntity.error;
       //TODO: transaction save
     }
   }
@@ -122,5 +116,17 @@ class PaySystemTerminal implements PaymentSystemSingle {
     final status =
         PaymentStatusOperationEntity.convertTerminal_StringToEnum(statusString);
     return status;
+  }
+
+  @override
+  Future<void> closingShift() async {
+    if (repositoryTelegram.initChat) {
+      final result = await payTerminal.reconciliationOfResults();
+      final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+      final dateTime = DateTime.now().toIso8601String();
+      final text =
+          "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+      await repositoryTelegram.sendMessage(text);
+    }
   }
 }

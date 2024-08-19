@@ -12,20 +12,26 @@ class YooKassaApi {
 
   YooKassaApi({
     required Dio dio,
-    required String username,
-    required String password,
   }) {
     {
       final options = BaseOptions(
         baseUrl: ParameterYookassaApi.host,
         connectTimeout: const Duration(seconds: 15),
-        headers: {
-          "Authorization":
-              'Basic ${base64Encode(utf8.encode('$username:$password'))}'
-        },
       );
       dio = Dio(options);
     }
+  }
+
+  void setParams({
+    required String username,
+    required String password,
+  }) {
+    dio.options = dio.options.copyWith(
+      headers: {
+        "Authorization":
+            'Basic ${base64Encode(utf8.encode('$username:$password'))}'
+      },
+    );
   }
 
   Future<Map<String, dynamic>> getHostPayment(

@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class CurrentSessionYookassa {
@@ -7,6 +8,8 @@ class CurrentSessionYookassa {
   final String? paymentId;
   final String? refundId;
   final double? amount;
+  final String? id;
+  final String? token;
   CurrentSessionYookassa({
     this.username,
     this.password,
@@ -14,6 +17,8 @@ class CurrentSessionYookassa {
     this.paymentId,
     this.refundId,
     this.amount,
+    this.id,
+    this.token,
   });
 
   CurrentSessionYookassa.init({
@@ -23,6 +28,8 @@ class CurrentSessionYookassa {
     this.paymentId,
     this.refundId,
     this.amount,
+    this.id,
+    this.token,
   });
 
   CurrentSessionYookassa.clear({
@@ -32,6 +39,8 @@ class CurrentSessionYookassa {
     this.paymentId,
     this.refundId,
     this.amount,
+    this.id,
+    this.token,
   });
 
   CurrentSessionYookassa copyWith({
@@ -41,6 +50,8 @@ class CurrentSessionYookassa {
     String? paymentId,
     String? refundId,
     double? amount,
+    String? id,
+    String? token,
   }) {
     return CurrentSessionYookassa(
       username: username ?? this.username,
@@ -49,6 +60,8 @@ class CurrentSessionYookassa {
       paymentId: paymentId ?? this.paymentId,
       refundId: refundId ?? this.refundId,
       amount: amount ?? this.amount,
+      id: id ?? this.id,
+      token: token ?? this.token,
     );
   }
 
@@ -65,7 +78,9 @@ class CurrentSessionYookassa {
         other.idempotenceKey == idempotenceKey &&
         other.paymentId == paymentId &&
         other.refundId == refundId &&
-        other.amount == amount;
+        other.amount == amount &&
+        other.id == id &&
+        other.token == token;
   }
 
   @override
@@ -75,7 +90,9 @@ class CurrentSessionYookassa {
         idempotenceKey.hashCode ^
         paymentId.hashCode ^
         refundId.hashCode ^
-        amount.hashCode;
+        amount.hashCode ^
+        id.hashCode ^
+        token.hashCode;
   }
 
   Map<String, dynamic> toMap() {
@@ -86,6 +103,8 @@ class CurrentSessionYookassa {
       'paymentId': paymentId,
       'refundId': refundId,
       'amount': amount,
+      'id': id,
+      'token': token,
     };
   }
 
@@ -99,6 +118,8 @@ class CurrentSessionYookassa {
       paymentId: map['paymentId'] != null ? map['paymentId'] as String : null,
       refundId: map['refundId'] != null ? map['refundId'] as String : null,
       amount: map['amount'] != null ? map['amount'] as double : null,
+      id: map['id'] != null ? map['id'] as String : null,
+      token: map['token'] != null ? map['token'] as String : null,
     );
   }
 
@@ -110,6 +131,6 @@ class CurrentSessionYookassa {
 
   @override
   String toString() {
-    return 'CurrentSessionYookassa(username: $username, password: $password, idempotenceKey: $idempotenceKey, paymentId: $paymentId, refundId: $refundId, amount: $amount)';
+    return 'CurrentSessionYookassa(username: $username, password: $password, idempotenceKey: $idempotenceKey, paymentId: $paymentId, refundId: $refundId, amount: $amount, id: $id, token: $token)';
   }
 }

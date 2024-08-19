@@ -32,7 +32,7 @@ dependencies:
   collection: ^1.16.0 
 
   shared_preferences: ^2.2.3
-  uuid: ^3.0.7
+  uuid: ^4.4.2
 
   pos_payment_terminal: ## ^1.0.5
     path: ../ttk_dart-main

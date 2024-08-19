@@ -7,16 +7,20 @@ import 'package:dio/dio.dart';
 //     "all_members_are_administrators": true
 // },
 class ApiTelegram {
-  static final String TOKEN_Telegram = '75_yfU';
+  final String? TOKEN_Telegram;
   // static String CHAT_ID_Telegram = '';
   // String createUrlMessagePUT(String textMessage) =>
   //     'https://api.telegram.org/bot$TOKEN_Telegram/sendMessage?chat_id=$CHAT_ID_Telegram&text=$textMessage';
 
-  const ApiTelegram(this._dio);
+  const ApiTelegram(this._dio, this.TOKEN_Telegram);
   final Dio _dio;
 
   Future<void> sendMessage(String message, String YOUR_CHAT_ID) async {
-    final String token = TOKEN_Telegram; //'YOUR_BOT_TOKEN';
+    if (TOKEN_Telegram == null) {
+      print('no settings telegram chat');
+      return;
+    }
+    final String token = TOKEN_Telegram!; //'YOUR_BOT_TOKEN';
     final String chatId = YOUR_CHAT_ID; //'YOUR_CHAT_ID';
     final String url = 'https://api.telegram.org/bot$token/sendMessage';
 

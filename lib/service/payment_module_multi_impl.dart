@@ -1,5 +1,6 @@
 import 'package:async/async.dart';
 import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
+import 'package:web_and_terminal_pay/data/local_sum_transaction.dart';
 import 'package:web_and_terminal_pay/pos/data/mapper/pay_system_mapper.dart';
 
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
@@ -17,12 +18,14 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   final YookassaRepository payYookassa;
   final AtolCheckService atolCheckService;
   final RepositoryTelegram repositoryTelegram;
+  final TransactionsSumSaveRepository transactionsSumSaveRepository;
 
   PaySystemWebAndTerminal({
     required this.payTerminal,
     required this.payYookassa,
     required this.atolCheckService,
     required this.repositoryTelegram,
+    required this.transactionsSumSaveRepository,
   });
 
   // ignore: unused_field
@@ -32,14 +35,13 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   CancelableOperation<bool>? _paymentOperation;
 
   @override
-  Future<void> init() async {
+  Future<void> init({String? Chat_ID}) async {
     final info = await payYookassa.getHostPayment();
     final payMethods = info['payment_methods'] as List<String>;
     List<PaymentMethodEntity> paymentMethods = [
       PaymentMethodEntity.termianlSber
     ];
-    //TODO: CityCreek Chat ID
-    repositoryTelegram.initChatId('-11');
+    repositoryTelegram.initChatId(Chat_ID);
     final listYookassaMethods = convertYookassa(payMethods);
     paymentMethods.addAll(listYookassaMethods);
     _paymentMethods = paymentMethods;
@@ -50,6 +52,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     payYookassa.clearSession();
     payTerminal.clearSession();
     await payTerminal.close();
+    _paymentModel = null;
     if (_paymentOperation != null) await _paymentOperation!.cancel();
   }
 
@@ -81,22 +84,32 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   }
 
   @override
-  Future<bool> pay(PayEntity paymentModel) async {
+  Future<PaymentStatusOperationEntity> pay(
+    PayEntity paymentModel, {
+    String? organizationsSelect,
+  }) async {
     if (_selectPaymentMethod == null) {
       throw Exception('no select payment method');
     }
     if (paymentModel.descriptionPay == null) {
       throw Exception('need add description transaction');
     }
+    _paymentModel = paymentModel;
 
     _paymentOperation =
         CancelableOperation.fromFuture(_executePayment(paymentModel));
 
     try {
-      return (await _paymentOperation!.valueOrCancellation(false))!;
+      final resultSuccess =
+          (await _paymentOperation!.valueOrCancellation(false))!;
+      if (resultSuccess) {
+        await transactionsSumSaveRepository
+            .plusSumTransactionPay(paymentModel.amountFull);
+      }
+      return PaymentStatusOperationEntity.success;
     } catch (e) {
       // TODO: Save Failure operation
-      return false;
+      return PaymentStatusOperationEntity.error;
     }
   }
 
@@ -205,6 +218,9 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     if (_selectPaymentMethod == null) {
       throw Exception('no select payment method');
     }
+    if (_paymentModel == null) {
+      throw Exception('no create pay');
+    }
     try {
       if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
         await payTerminal.refoundPay();
@@ -214,6 +230,9 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         await payYookassa.refundPayment();
         return true;
       }
+      await transactionsSumSaveRepository
+          .minusSumTransactionPay(_paymentModel!.amountFull);
+      _paymentModel = null;
       return false;
     } catch (e) {
       // TODO: Save Failure operation
@@ -242,11 +261,13 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
 
   @override
   Future<void> closingShift() async {
-    final result = await payTerminal.reconciliationOfResults();
-    final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
-    final dateTime = DateTime.now().toIso8601String();
-    final text =
-        "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
-    await repositoryTelegram.sendMessage(text);
+    if (repositoryTelegram.initChat) {
+      final result = await payTerminal.reconciliationOfResults();
+      final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+      final dateTime = DateTime.now().toIso8601String();
+      final text =
+          "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+      await repositoryTelegram.sendMessage(text);
+    }
   }
 }

@@ -12,7 +12,7 @@ class PayEntity {
   final double amountFull;
   final String? emailClient;
   final String? phoneClient;
-  final String callbackUrl;
+  final String? callbackUrl;
   final String? descriptionPay;
   final List<ItemListModelSS> items;
   PayEntity({
