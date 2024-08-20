@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:atol_online_dart/atol_online_v1_4/model/check_atol_entity.dart';
 import 'package:collection/collection.dart';
 import 'package:web_and_terminal_pay/service/entity/enum_payment_object_check.dart';
+// import 'package:web_and_terminal_pay/service/entity/payment_methods.dart';
 
 class PayEntity {
   final String idTransaction;
@@ -14,6 +15,7 @@ class PayEntity {
   final String? phoneClient;
   final String? callbackUrl;
   final String? descriptionPay;
+  // final PaymentMethodEntity methodPay;
   final List<ItemListModelSS> items;
   PayEntity({
     required this.idTransaction,

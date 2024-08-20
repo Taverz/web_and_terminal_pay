@@ -2,6 +2,7 @@ import 'package:async/async.dart';
 import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
 import 'package:web_and_terminal_pay/data/local_sum_transaction.dart';
 import 'package:web_and_terminal_pay/pos/data/mapper/pay_system_mapper.dart';
+import 'package:web_and_terminal_pay/pos/model/pay/send/send_pos_payment_model.dart';
 
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
@@ -36,14 +37,21 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
 
   @override
   Future<void> init({String? Chat_ID}) async {
-    final info = await payYookassa.getHostPayment();
-    final payMethods = info['payment_methods'] as List<String>;
     List<PaymentMethodEntity> paymentMethods = [
       PaymentMethodEntity.termianlSber
     ];
-    repositoryTelegram.initChatId(Chat_ID);
-    final listYookassaMethods = convertYookassa(payMethods);
-    paymentMethods.addAll(listYookassaMethods);
+    try {
+      final info = await payYookassa.getHostPayment();
+      // final payMethods = info['payment_methods'] as List<String>;
+      paymentMethods.addAll(info);
+    } catch (e) {}
+    try {
+      repositoryTelegram.initChatId(Chat_ID);
+    } catch (e) {}
+
+    payTerminal.init();
+    transactionsSumSaveRepository.init();
+
     _paymentMethods = paymentMethods;
   }
 
@@ -63,13 +71,15 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         'no contains methods pay, pless run init() from load method pay',
       );
     }
-    List<PaymentMethodEntity> paymentMethods = [
-      PaymentMethodEntity.termianlSber
-    ];
-    final paymentMethYookassa = await payYookassa.getMethodsPayment();
-    final listYookassaMethods = convertYookassa(paymentMethYookassa);
-    paymentMethods.addAll(listYookassaMethods);
-    _paymentMethods = paymentMethods;
+    // List<PaymentMethodEntity> paymentMethods = [
+    //   PaymentMethodEntity.termianlSber
+    // ];
+    // try {
+    //   final paymentMethYookassa = await payYookassa.getMethodsPayment();
+    //   final listYookassaMethods = convertYookassa(paymentMethYookassa);
+    //   paymentMethods.addAll(listYookassaMethods);
+    // } catch (e) {}
+    // _paymentMethods = paymentMethods;
     return _paymentMethods!;
   }
 
@@ -95,16 +105,18 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
       throw Exception('need add description transaction');
     }
     _paymentModel = paymentModel;
-
-    _paymentOperation =
-        CancelableOperation.fromFuture(_executePayment(paymentModel));
-
     try {
+      //TODO: если ошибка то выдает успещный результат оплаты
+      _paymentOperation =
+          CancelableOperation.fromFuture(_executePayment(paymentModel));
+
       final resultSuccess =
           (await _paymentOperation!.valueOrCancellation(false))!;
       if (resultSuccess) {
         await transactionsSumSaveRepository
             .plusSumTransactionPay(paymentModel.amountFull);
+      } else {
+        return PaymentStatusOperationEntity.error;
       }
       return PaymentStatusOperationEntity.success;
     } catch (e) {
@@ -116,8 +128,13 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   Future<bool> _executePayment(PayEntity paymentModel) async {
     try {
       if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
+        final modelTerminalPay = SendPosPaymentModel(
+          clientId: paymentModel.clientId,
+          idempotenceKeyERN: paymentModel.idempotenceKey,
+          amount: paymentModel.amountFull,
+        );
         final result =
-            await payTerminal.createPay(paymentModel) as GetPosPaymentModel;
+            await payTerminal.createPay(modelTerminalPay) as GetPosPaymentModel;
 
         if (_paymentOperation!.isCanceled) {
           return await _handleAbortedPayment();
@@ -162,8 +179,9 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         _selectPaymentMethod != PaymentMethodEntity.termianlSber) {
       isPaid = await payYookassa.statusPayAfterCapture();
     } else if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
-      isPaid = ((await payTerminal.checkStatusCurrentOperation()) ?? '')
-          .contains('оплачено');
+      isPaid = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
+              ((await payTerminal.checkStatusCurrentOperation()) ?? '')) ==
+          PaymentStatusOperationEntity.success;
     }
 
     if (isPaid) {

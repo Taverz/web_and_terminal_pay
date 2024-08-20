@@ -11,14 +11,15 @@ class YooKassaApi {
   late Dio dio;
 
   YooKassaApi({
-    required Dio dio,
+    required Dio dioW,
   }) {
     {
       final options = BaseOptions(
         baseUrl: ParameterYookassaApi.host,
         connectTimeout: const Duration(seconds: 15),
       );
-      dio = Dio(options);
+      dioW.options = options;
+      dio = dioW;
     }
   }
 
@@ -34,8 +35,7 @@ class YooKassaApi {
     );
   }
 
-  Future<Map<String, dynamic>> getHostPayment(
-      {required String username, required String password}) async {
+  Future<Map<String, dynamic>> getHostPayment() async {
     try {
       final response = await dio.get(
         'me',

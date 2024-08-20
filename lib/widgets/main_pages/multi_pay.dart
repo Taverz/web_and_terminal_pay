@@ -7,6 +7,7 @@ import 'package:web_and_terminal_pay/crud/sharedpreference/crud_shared_preferenc
 import 'package:web_and_terminal_pay/data/local_sum_transaction.dart';
 import 'package:web_and_terminal_pay/pos/data/pos_local_db_impl.dart';
 import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
+import 'package:web_and_terminal_pay/service/model/pos_settings_model.dart';
 
 import 'package:web_and_terminal_pay/service/payment_module_multi.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
@@ -41,6 +42,10 @@ class _MultiPaymentPageState extends State<MultiPaymentPage> {
     final dio = Dio();
     paymentSystemMulti = PaySystemWebAndTerminal(
       payTerminal: PaymentSberTerminalKozenP12(
+        posSettingsModel: PosSettingsModel(
+          terminalIP: '198.165.0.100',
+          terminalPort: 8888,
+        ),
         sberLocalDB: SberLocalDB(
           SharedPreferencesCRUD(),
           SharedPreferencesCRUD(),
@@ -49,7 +54,7 @@ class _MultiPaymentPageState extends State<MultiPaymentPage> {
       ),
       payYookassa: YookassaRepository(
         YooKassaApi(
-          dio: dio,
+          dioW: dio,
         ),
         CurrentSessionYookassa(),
         YookassaSaveRepository(),

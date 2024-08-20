@@ -24,6 +24,10 @@ class PayPageSberTestExample extends StatefulWidget {
 
 class _PayPageSberTestExampleState extends State<PayPageSberTestExample> {
   final PayTerminal payTerminal = PaymentSberTerminalKozenP12(
+    posSettingsModel: PosSettingsModel(
+      terminalIP: '198.165.0.100',
+      terminalPort: 8888,
+    ),
     sberLocalDB: SberLocalDB(
       SharedPreferencesCRUD(),
       SharedPreferencesCRUD(),

@@ -13,6 +13,9 @@ enum PaymentStatusOperationEntity {
     if (statusString.contains('оплачено')) {
       return PaymentStatusOperationEntity.success;
     }
+    if (statusString.contains('ОДОБРЕНО')) {
+      return PaymentStatusOperationEntity.success;
+    }
     if (statusString.contains('успешно')) {
       return PaymentStatusOperationEntity.success;
     }
@@ -43,6 +46,9 @@ enum PaymentStatusOperationEntity {
   ) {
     final statusString = ((termianlCheckStatus) ?? '').toUpperCase();
     if (statusString.contains('оплачено')) {
+      return PaymentStatusOperationEntity.success;
+    }
+    if (statusString.contains('ОДОБРЕНО')) {
       return PaymentStatusOperationEntity.success;
     }
     if (statusString.contains('успешно')) {
