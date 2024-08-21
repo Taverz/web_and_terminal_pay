@@ -16,6 +16,9 @@ enum PaymentStatusOperationEntity {
     if (statusString.contains('ОДОБРЕНО')) {
       return PaymentStatusOperationEntity.success;
     }
+    if (statusString.contains('Операция была отменена')) {
+      return PaymentStatusOperationEntity.cancel;
+    }
     if (statusString.contains('успешно')) {
       return PaymentStatusOperationEntity.success;
     }
@@ -50,6 +53,9 @@ enum PaymentStatusOperationEntity {
     }
     if (statusString.contains('ОДОБРЕНО')) {
       return PaymentStatusOperationEntity.success;
+    }
+    if (statusString.contains('Операция была отменена')) {
+      return PaymentStatusOperationEntity.cancel;
     }
     if (statusString.contains('успешно')) {
       return PaymentStatusOperationEntity.success;
