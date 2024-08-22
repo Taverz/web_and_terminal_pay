@@ -119,7 +119,7 @@ class PaySystemTerminal implements PaymentSystemSingle {
   }
 
   @override
-  Future<void> closingShift() async {
+  Future<String?> closingShift() async {
     if (repositoryTelegram.initChat) {
       final result = await payTerminal.reconciliationOfResults();
       final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
@@ -127,6 +127,8 @@ class PaySystemTerminal implements PaymentSystemSingle {
       final text =
           "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
       await repositoryTelegram.sendMessage(text);
+      return result;
     }
+    return null;
   }
 }

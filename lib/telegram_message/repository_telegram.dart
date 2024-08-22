@@ -6,8 +6,8 @@ class RepositoryTelegram {
   static String? CHAT_ID;
   bool get initChat => CHAT_ID != null;
 
-  void initChatId(String? CHAT_ID) {
-    CHAT_ID = CHAT_ID;
+  void initChatId(String? ID) {
+    CHAT_ID = ID;
   }
 
   Future<void> sendMessage(String message) async {

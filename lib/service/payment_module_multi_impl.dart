@@ -141,7 +141,8 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         if (_paymentOperation!.isCanceled) {
           return await _handleAbortedPayment();
         }
-        final status = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
+        final status =
+            PaymentStatusOperationEntity.convertTerminal_StringToEnum(
           result.statusText,
         );
         return status;
@@ -290,14 +291,65 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   }
 
   @override
-  Future<void> closingShift() async {
+  Future<String?> closingShift() async {
+    String? resultCloseShit;
+    try {
+      final result = await payTerminal
+          .reconciliationOfResults()
+          .timeout(const Duration(seconds: 8));
+      resultCloseShit = result;
+    } catch (e) {
+      resultCloseShit = 'Ошибка получения сверки итогов';
+    }
     if (repositoryTelegram.initChat) {
-      final result = await payTerminal.reconciliationOfResults();
       final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
       final dateTime = DateTime.now().toIso8601String();
       final text =
-          "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+          "\n <Сверка итогов> \n---------------------\n LOCAL date time: ${dateTime}  \n\n UTC date time: ${dateTimeUTC} \n\n CHAT_reconciliationOfResults \n\n--------------------\n ${resultCloseShit}";
       await repositoryTelegram.sendMessage(text);
     }
+    return resultCloseShit;
   }
 }
+
+final resultExampleCloseShit = """
+      IT услуги             
+      Ростов-на-Дону, Ростовская облас 
+      ул. Металлургическая, зд 102/2  
+              т. 79044478621          
+      20.08.24     16:17    ЧЕК   0002 
+      ПАО СБЕРБАНК              Оплата 
+      Т: 32149782       М:211000230975 
+      Mastercard        A0000000041010 
+      Карта:(E1)      ****8666 
+      Сумма (Руб):                6.00 
+      Комиссия за операцию - 0 Руб. 
+                  ОДОБРЕНО 
+      К/А: 247317  RRN:   423312040409 
+      Подпись клиента не требуется   
+      EC3CCAE1066D400B7A3A350C69F28167 
+      ================================ 
+      
+      
+      
+      ~S           IT услуги             
+      Ростов-на-Дону, Ростовская облас 
+      ул. Металлургическая, зд 102/2  
+              т. 79044478621          
+      20.08.24     16:17    ЧЕК   0002 
+      ПАО СБЕРБАНК              Оплата 
+      Т: 32149782       М:211000230975 
+      Mastercard        A0000000041010 
+      Карта:(E1)      ****8666 
+      Сумма (Руб):                6.00 
+      Комиссия за операцию - 0 Руб. 
+                  ОДОБРЕНО 
+      К/А: 247317  RRN:   423312040409 
+      Подпись клиента не требуется   
+      EC3CCAE1066D400B7A3A350C69F28167 
+      ================================ 
+      
+      
+      
+      ~S
+      """;

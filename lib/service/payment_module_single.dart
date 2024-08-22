@@ -22,7 +22,7 @@ abstract class PaymentSystemSingle implements PaymentSystem {
   Future<void> selectPaymentMethod(int index);
 
   /// Закрытие смены
-  Future<void> closingShift();
+  Future<String?> closingShift();
 
   /// Закрыть стримы и порчее ...
   Future<void> close();
