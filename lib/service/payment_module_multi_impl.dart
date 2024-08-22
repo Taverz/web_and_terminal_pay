@@ -33,7 +33,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   PayEntity? _paymentModel;
   List<PaymentMethodEntity>? _paymentMethods;
   PaymentMethodEntity? _selectPaymentMethod;
-  CancelableOperation<bool>? _paymentOperation;
+  CancelableOperation<PaymentStatusOperationEntity>? _paymentOperation;
 
   @override
   Future<void> init({String? Chat_ID}) async {
@@ -110,22 +110,23 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
       _paymentOperation =
           CancelableOperation.fromFuture(_executePayment(paymentModel));
 
-      final resultSuccess =
-          (await _paymentOperation!.valueOrCancellation(false))!;
-      if (resultSuccess) {
+      final resultSuccess = (await _paymentOperation!
+          .valueOrCancellation(PaymentStatusOperationEntity.cancel))!;
+      if (resultSuccess == PaymentStatusOperationEntity.success) {
         await transactionsSumSaveRepository
             .plusSumTransactionPay(paymentModel.amountFull);
       } else {
-        return PaymentStatusOperationEntity.error;
+        return resultSuccess;
       }
-      return PaymentStatusOperationEntity.success;
+      return PaymentStatusOperationEntity.error;
     } catch (e) {
       // TODO: Save Failure operation
       return PaymentStatusOperationEntity.error;
     }
   }
 
-  Future<bool> _executePayment(PayEntity paymentModel) async {
+  Future<PaymentStatusOperationEntity> _executePayment(
+      PayEntity paymentModel) async {
     try {
       if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
         final modelTerminalPay = SendPosPaymentModel(
@@ -137,10 +138,13 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
             await payTerminal.createPay(modelTerminalPay) as GetPosPaymentModel;
 
         if (_paymentOperation!.isCanceled) {
-          return await _handleAbortedPayment();
+          return await _handleAbortedPayment()
+              ? PaymentStatusOperationEntity.success
+              : PaymentStatusOperationEntity.error;
         }
 
-        return result.success;
+        return PaymentStatusOperationEntity.convertTerminal_StringToEnum(
+            result.statusText);
       } else {
         final result = await payYookassa.createPayment(
           paymentModel: createPaymentModelServiceToYookassa(
@@ -148,18 +152,22 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         );
 
         if (_paymentOperation!.isCanceled) {
-          return await _handleAbortedPayment();
+          return await _handleAbortedPayment()
+              ? PaymentStatusOperationEntity.success
+              : PaymentStatusOperationEntity.error;
         }
 
         if (result.paid) {
           final payStatus = await payYookassa.statusPayAfterCapture();
-          return payStatus;
+          return payStatus
+              ? PaymentStatusOperationEntity.success
+              : PaymentStatusOperationEntity.error;
         }
       }
-      return false;
+      return PaymentStatusOperationEntity.error;
     } catch (e) {
       // TODO: Save Failure operation
-      return false;
+      return PaymentStatusOperationEntity.error;
     }
   }
 
@@ -260,19 +268,21 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
 
   @override
   Future<PaymentStatusOperationEntity> statusPay() async {
-    bool isPaid = false;
-
+    if (_paymentModel == null) {
+      return PaymentStatusOperationEntity.noStartPay;
+    }
     if (_selectPaymentMethod != null &&
         _selectPaymentMethod != PaymentMethodEntity.termianlSber) {
-      isPaid = await payYookassa.statusPayAfterCapture();
+      final isPaid = await payYookassa.statusPayAfterCapture();
+      if (isPaid) {
+        return PaymentStatusOperationEntity.success;
+      }
+      return PaymentStatusOperationEntity.error;
     } else if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
-      isPaid = ((await payTerminal.checkStatusCurrentOperation()) ?? '')
-          .contains('оплачено');
-    } else {
-      isPaid = false;
-    }
-    if (isPaid) {
-      return PaymentStatusOperationEntity.success;
+      final status = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
+        (await payTerminal.checkStatusCurrentOperation()) ?? '',
+      );
+      return status;
     }
     return PaymentStatusOperationEntity.error;
   }

@@ -1,10 +1,12 @@
 enum PaymentStatusOperationEntity {
   inProcessing,
+  start,
   success,
   cancel,
+  noStartPay,
   error,
   noMoney,
-  await;
+  awaited;
 
   static PaymentStatusOperationEntity convertTerminal_StringToEnum(
     String? termianlCheckStatus,
@@ -13,26 +15,29 @@ enum PaymentStatusOperationEntity {
     if (statusString.contains('оплачено')) {
       return PaymentStatusOperationEntity.success;
     }
-    if (statusString.contains('ОДОБРЕНО')) {
+    if (statusString.contains('ОДОБРЕНО')) {//
       return PaymentStatusOperationEntity.success;
     }
-    if (statusString.contains('Операция была отменена')) {
-      return PaymentStatusOperationEntity.cancel;
-    }
-    if (statusString.contains('успешно')) {
+    if (statusString.contains('успешно')) {//
       return PaymentStatusOperationEntity.success;
     }
     if (statusString.contains('ошибка')) {
       return PaymentStatusOperationEntity.error;
     }
+    if (statusString.contains('Операция была отменена')) {//
+      return PaymentStatusOperationEntity.cancel;
+    }
     if (statusString.contains('отмена')) {
       return PaymentStatusOperationEntity.cancel;
+    }
+    if (statusString.contains('Авторизация в банке')) {//
+      return PaymentStatusOperationEntity.start;
     }
     if (statusString.contains('в обработке')) {
       return PaymentStatusOperationEntity.inProcessing;
     }
-    if (statusString.contains('ожидание')) {
-      return PaymentStatusOperationEntity.await;
+    if (statusString.contains('ожидание')) {//
+      return PaymentStatusOperationEntity.awaited;
     }
     if (statusString.contains('недостаточно средств')) {
       return PaymentStatusOperationEntity.noMoney;
@@ -70,7 +75,7 @@ enum PaymentStatusOperationEntity {
       return PaymentStatusOperationEntity.inProcessing;
     }
     if (statusString.contains('ожидание')) {
-      return PaymentStatusOperationEntity.await;
+      return PaymentStatusOperationEntity.awaited;
     }
     if (statusString.contains('недостаточно средств')) {
       return PaymentStatusOperationEntity.noMoney;

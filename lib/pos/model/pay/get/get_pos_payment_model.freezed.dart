@@ -20,6 +20,7 @@ mixin _$GetPosPaymentModel {
   String get idempotenceKeyERN => throw _privateConstructorUsedError;
   bool get success => throw _privateConstructorUsedError;
   String? get receipt => throw _privateConstructorUsedError;
+  String? get statusText => throw _privateConstructorUsedError;
   double get amount => throw _privateConstructorUsedError;
   DateTime get dateTime => throw _privateConstructorUsedError;
   String? get rrn => throw _privateConstructorUsedError;
@@ -41,6 +42,7 @@ abstract class $GetPosPaymentModelCopyWith<$Res> {
       String idempotenceKeyERN,
       bool success,
       String? receipt,
+      String? statusText,
       double amount,
       DateTime dateTime,
       String? rrn,
@@ -64,6 +66,7 @@ class _$GetPosPaymentModelCopyWithImpl<$Res, $Val extends GetPosPaymentModel>
     Object? idempotenceKeyERN = null,
     Object? success = null,
     Object? receipt = freezed,
+    Object? statusText = freezed,
     Object? amount = null,
     Object? dateTime = null,
     Object? rrn = freezed,
@@ -85,6 +88,10 @@ class _$GetPosPaymentModelCopyWithImpl<$Res, $Val extends GetPosPaymentModel>
       receipt: freezed == receipt
           ? _value.receipt
           : receipt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      statusText: freezed == statusText
+          ? _value.statusText
+          : statusText // ignore: cast_nullable_to_non_nullable
               as String?,
       amount: null == amount
           ? _value.amount
@@ -119,6 +126,7 @@ abstract class _$$GetPosPaymentModelImplCopyWith<$Res>
       String idempotenceKeyERN,
       bool success,
       String? receipt,
+      String? statusText,
       double amount,
       DateTime dateTime,
       String? rrn,
@@ -140,6 +148,7 @@ class __$$GetPosPaymentModelImplCopyWithImpl<$Res>
     Object? idempotenceKeyERN = null,
     Object? success = null,
     Object? receipt = freezed,
+    Object? statusText = freezed,
     Object? amount = null,
     Object? dateTime = null,
     Object? rrn = freezed,
@@ -161,6 +170,10 @@ class __$$GetPosPaymentModelImplCopyWithImpl<$Res>
       receipt: freezed == receipt
           ? _value.receipt
           : receipt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      statusText: freezed == statusText
+          ? _value.statusText
+          : statusText // ignore: cast_nullable_to_non_nullable
               as String?,
       amount: null == amount
           ? _value.amount
@@ -190,6 +203,7 @@ class _$GetPosPaymentModelImpl implements _GetPosPaymentModel {
       required this.idempotenceKeyERN,
       required this.success,
       required this.receipt,
+      required this.statusText,
       required this.amount,
       required this.dateTime,
       required this.rrn,
@@ -204,6 +218,8 @@ class _$GetPosPaymentModelImpl implements _GetPosPaymentModel {
   @override
   final String? receipt;
   @override
+  final String? statusText;
+  @override
   final double amount;
   @override
   final DateTime dateTime;
@@ -215,7 +231,7 @@ class _$GetPosPaymentModelImpl implements _GetPosPaymentModel {
 
   @override
   String toString() {
-    return 'GetPosPaymentModel(clientId: $clientId, idempotenceKeyERN: $idempotenceKeyERN, success: $success, receipt: $receipt, amount: $amount, dateTime: $dateTime, rrn: $rrn, type: $type)';
+    return 'GetPosPaymentModel(clientId: $clientId, idempotenceKeyERN: $idempotenceKeyERN, success: $success, receipt: $receipt, statusText: $statusText, amount: $amount, dateTime: $dateTime, rrn: $rrn, type: $type)';
   }
 
   @override
@@ -229,6 +245,8 @@ class _$GetPosPaymentModelImpl implements _GetPosPaymentModel {
                 other.idempotenceKeyERN == idempotenceKeyERN) &&
             (identical(other.success, success) || other.success == success) &&
             (identical(other.receipt, receipt) || other.receipt == receipt) &&
+            (identical(other.statusText, statusText) ||
+                other.statusText == statusText) &&
             (identical(other.amount, amount) || other.amount == amount) &&
             (identical(other.dateTime, dateTime) ||
                 other.dateTime == dateTime) &&
@@ -238,7 +256,7 @@ class _$GetPosPaymentModelImpl implements _GetPosPaymentModel {
 
   @override
   int get hashCode => Object.hash(runtimeType, clientId, idempotenceKeyERN,
-      success, receipt, amount, dateTime, rrn, type);
+      success, receipt, statusText, amount, dateTime, rrn, type);
 
   @JsonKey(ignore: true)
   @override
@@ -254,6 +272,7 @@ abstract class _GetPosPaymentModel implements GetPosPaymentModel {
       required final String idempotenceKeyERN,
       required final bool success,
       required final String? receipt,
+      required final String? statusText,
       required final double amount,
       required final DateTime dateTime,
       required final String? rrn,
@@ -267,6 +286,8 @@ abstract class _GetPosPaymentModel implements GetPosPaymentModel {
   bool get success;
   @override
   String? get receipt;
+  @override
+  String? get statusText;
   @override
   double get amount;
   @override

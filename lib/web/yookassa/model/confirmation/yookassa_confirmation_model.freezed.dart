@@ -21,9 +21,11 @@ YookassaConfirmationModel _$YookassaConfirmationModelFromJson(
 
 /// @nodoc
 mixin _$YookassaConfirmationModel {
-  YookassaConfirmationTypeEnum get type => throw _privateConstructorUsedError;
+  YookassaConfirmationTypeEnum get type =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'confirmation_url')
-  String? get confirmationUrl => throw _privateConstructorUsedError;
+  String? get confirmationUrl =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'return_url')
   String? get returnUrl => throw _privateConstructorUsedError;
 
@@ -142,9 +144,11 @@ class _$YookassaConfirmationModelImpl implements _YookassaConfirmationModel {
 
   @override
   final YookassaConfirmationTypeEnum type;
+// ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'confirmation_url')
   final String? confirmationUrl;
+// ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'return_url')
   final String? returnUrl;
@@ -198,10 +202,10 @@ abstract class _YookassaConfirmationModel implements YookassaConfirmationModel {
 
   @override
   YookassaConfirmationTypeEnum get type;
-  @override
+  @override // ignore: invalid_annotation_target
   @JsonKey(name: 'confirmation_url')
   String? get confirmationUrl;
-  @override
+  @override // ignore: invalid_annotation_target
   @JsonKey(name: 'return_url')
   String? get returnUrl;
   @override

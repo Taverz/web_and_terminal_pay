@@ -184,6 +184,20 @@ class PaymentSberTerminalKozenP12 implements PayTerminal {
     _currentOperation = _currentOperation.copyWith(
       retrievalReferenceNumber: resultCreatePay.retrievalReferenceNumber,
     );
+
+    // final convertStringTiEnumStatus = PaymentStatusOperationEntity.convertTerminal_StringToEnum();
+    //  if (paymentStatusEntity == PaymentStatusOperationEntity.error) {
+    //     return TODO: check status 3;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.start)) {
+    //     return TODO: check status 1;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.noMoney)) {
+    //     return TODO: check status 1;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.cancel)) {
+    //     return TODO: check status 1;
+    //   }
     await sberLocalDB.saveTransaction(
       mapCurrentCheck: TransactionTerminal(
         request: (paymentModel as SendPosPaymentModel),
@@ -205,6 +219,7 @@ class PaymentSberTerminalKozenP12 implements PayTerminal {
       idempotenceKeyERN: idempotenceKey,
       success: resultCreatePay.success,
       receipt: resultCreatePay.receipt,
+      statusText: resultCreatePay.statusText,
       amount: resultCreatePay.amount,
       rrn: resultCreatePay.retrievalReferenceNumber,
       dateTime: mapper.convertPosToDateTime(
