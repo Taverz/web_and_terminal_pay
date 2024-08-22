@@ -303,7 +303,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     }
     if (repositoryTelegram.initChat) {
       final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
-      final dateTime = DateTime.now().toIso8601String();
+      final dateTime = DateTime.now().toIso8601String().replaceFirst('T', ' ');
       final text =
           "\n <Сверка итогов> \n---------------------\n LOCAL date time: ${dateTime}  \n\n UTC date time: ${dateTimeUTC} \n\n CHAT_reconciliationOfResults \n\n--------------------\n ${resultCloseShit}";
       await repositoryTelegram.sendMessage(text);
