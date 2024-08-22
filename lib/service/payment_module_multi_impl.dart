@@ -126,7 +126,8 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   }
 
   Future<PaymentStatusOperationEntity> _executePayment(
-      PayEntity paymentModel) async {
+    PayEntity paymentModel,
+  ) async {
     try {
       if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
         final modelTerminalPay = SendPosPaymentModel(
@@ -138,23 +139,22 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
             await payTerminal.createPay(modelTerminalPay) as GetPosPaymentModel;
 
         if (_paymentOperation!.isCanceled) {
-          return await _handleAbortedPayment()
-              ? PaymentStatusOperationEntity.success
-              : PaymentStatusOperationEntity.error;
+          return await _handleAbortedPayment();
         }
-
-        return PaymentStatusOperationEntity.convertTerminal_StringToEnum(
-            result.statusText);
+        final status = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
+          result.statusText,
+        );
+        return status;
       } else {
         final result = await payYookassa.createPayment(
           paymentModel: createPaymentModelServiceToYookassa(
-              paymentModel, _selectPaymentMethod),
+            paymentModel,
+            _selectPaymentMethod,
+          ),
         );
 
         if (_paymentOperation!.isCanceled) {
-          return await _handleAbortedPayment()
-              ? PaymentStatusOperationEntity.success
-              : PaymentStatusOperationEntity.error;
+          return await _handleAbortedPayment();
         }
 
         if (result.paid) {
@@ -177,27 +177,29 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     await _handleAbortedPayment();
   }
 
-  Future<bool> _handleAbortedPayment() async {
-    bool isPaid = false;
+  Future<PaymentStatusOperationEntity> _handleAbortedPayment() async {
+    PaymentStatusOperationEntity isPaid = PaymentStatusOperationEntity.cancel;
 
     if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
       await payTerminal.abortPay();
     }
     if (_selectPaymentMethod != null &&
         _selectPaymentMethod != PaymentMethodEntity.termianlSber) {
-      isPaid = await payYookassa.statusPayAfterCapture();
+      isPaid = await payYookassa.statusPayAfterCapture()
+          ? PaymentStatusOperationEntity.success
+          : PaymentStatusOperationEntity.error;
     } else if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
       isPaid = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
-              ((await payTerminal.checkStatusCurrentOperation()) ?? '')) ==
-          PaymentStatusOperationEntity.success;
+        (await payTerminal.checkStatusCurrentOperation()) ?? '',
+      );
     }
 
-    if (isPaid) {
+    if (isPaid == PaymentStatusOperationEntity.error) {
       await refound();
-      return false;
+      return PaymentStatusOperationEntity.refundSuccess;
     }
 
-    return false;
+    return PaymentStatusOperationEntity.error;
   }
 
   @override
