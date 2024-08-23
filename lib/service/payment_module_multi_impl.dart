@@ -71,6 +71,8 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         'no contains methods pay, pless run init() from load method pay',
       );
     }
+    /// Закоментировано поттому что выполняется при иницализации
+    ///
     // List<PaymentMethodEntity> paymentMethods = [
     //   PaymentMethodEntity.termianlSber
     // ];
@@ -145,6 +147,9 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
             PaymentStatusOperationEntity.convertTerminal_StringToEnum(
           result.statusText,
         );
+        if (status == PaymentStatusOperationEntity.error) {
+          await _errorPayNotification(status);
+        }
         return status;
       } else {
         final result = await payYookassa.createPayment(
@@ -195,9 +200,12 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
       );
     }
 
+    // if (isPaid == PaymentStatusOperationEntity.error) {
+    //   await refound();
+    //   return PaymentStatusOperationEntity.refundSuccess;
+    // }
     if (isPaid == PaymentStatusOperationEntity.error) {
-      await refound();
-      return PaymentStatusOperationEntity.refundSuccess;
+      await _errorPayNotification(PaymentStatusOperationEntity.error);
     }
 
     return PaymentStatusOperationEntity.error;
@@ -269,6 +277,24 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     }
   }
 
+  Future<void> _errorPayNotification(
+    PaymentStatusOperationEntity status,
+  ) async {
+    try {
+      if (repositoryTelegram.initChat) {
+        final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+        final dateTime =
+            DateTime.now().toIso8601String().replaceFirst('T', ' ');
+        final titleStatus = status == PaymentStatusOperationEntity.error ? "🆘 <Ошибка оплаты> 🆘" : "❔ <Проверка статуса оплаты> ❔";
+        final textMessage =
+            " Сумма оплаты: ${_paymentModel?.amountFull}  \n Предметы оплаты: \n${_paymentModel?.items.map((e) => " \n " + e.name + " Количество: " + e.quantity.toString() + " Цена за штю.: " + e.price.toString() + '\n')}  \n ";
+        final text =
+            "\n $titleStatus \n Статус: ${status.toString()} \n---------------------\n LOCAL date time: $dateTime  \n\n UTC date time: $dateTimeUTC \n\n CHAT_payError \n\n--------------------\n $textMessage";
+        await repositoryTelegram.sendMessage(text);
+      }
+    } catch (e) {}
+  }
+
   @override
   Future<PaymentStatusOperationEntity> statusPay() async {
     if (_paymentModel == null) {
@@ -278,15 +304,22 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         _selectPaymentMethod != PaymentMethodEntity.termianlSber) {
       final isPaid = await payYookassa.statusPayAfterCapture();
       if (isPaid) {
+        await _errorPayNotification(PaymentStatusOperationEntity.success);
         return PaymentStatusOperationEntity.success;
+      } else {
+        await _errorPayNotification(PaymentStatusOperationEntity.error);
       }
       return PaymentStatusOperationEntity.error;
     } else if (_selectPaymentMethod == PaymentMethodEntity.termianlSber) {
       final status = PaymentStatusOperationEntity.convertTerminal_StringToEnum(
         (await payTerminal.checkStatusCurrentOperation()) ?? '',
       );
+
+      await _errorPayNotification(status);
+
       return status;
     }
+
     return PaymentStatusOperationEntity.error;
   }
 
@@ -305,51 +338,45 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
       final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
       final dateTime = DateTime.now().toIso8601String().replaceFirst('T', ' ');
       final text =
-          "\n <Сверка итогов> \n---------------------\n LOCAL date time: ${dateTime}  \n\n UTC date time: ${dateTimeUTC} \n\n CHAT_reconciliationOfResults \n\n--------------------\n ${resultCloseShit}";
+          "\n 🧮 <Сверка итогов> 📖 \n---------------------\n LOCAL date time: ${dateTime}  \n\n UTC date time: ${dateTimeUTC} \n\n CHAT_reconciliationOfResults \n\n--------------------\n ${resultCloseShit}";
       await repositoryTelegram.sendMessage(text);
     }
     return resultCloseShit;
   }
 }
 
-final resultExampleCloseShit = """
-      IT услуги             
-      Ростов-на-Дону, Ростовская облас 
-      ул. Металлургическая, зд 102/2  
-              т. 79044478621          
-      20.08.24     16:17    ЧЕК   0002 
-      ПАО СБЕРБАНК              Оплата 
-      Т: 32149782       М:211000230975 
-      Mastercard        A0000000041010 
-      Карта:(E1)      ****8666 
-      Сумма (Руб):                6.00 
-      Комиссия за операцию - 0 Руб. 
-                  ОДОБРЕНО 
-      К/А: 247317  RRN:   423312040409 
-      Подпись клиента не требуется   
-      EC3CCAE1066D400B7A3A350C69F28167 
-      ================================ 
-      
-      
-      
-      ~S           IT услуги             
-      Ростов-на-Дону, Ростовская облас 
-      ул. Металлургическая, зд 102/2  
-              т. 79044478621          
-      20.08.24     16:17    ЧЕК   0002 
-      ПАО СБЕРБАНК              Оплата 
-      Т: 32149782       М:211000230975 
-      Mastercard        A0000000041010 
-      Карта:(E1)      ****8666 
-      Сумма (Руб):                6.00 
-      Комиссия за операцию - 0 Руб. 
-                  ОДОБРЕНО 
-      К/А: 247317  RRN:   423312040409 
-      Подпись клиента не требуется   
-      EC3CCAE1066D400B7A3A350C69F28167 
-      ================================ 
-      
-      
-      
-      ~S
-      """;
+// final resultExampleCloseShit = """
+//       IT услуги             
+//       Ростов-на-Дону, Ростовская облас 
+//       ул. Металлургическая, зд 102/2  
+//               т. 79044478621          
+//       20.08.24     16:17    ЧЕК   0002 
+//       ПАО СБЕРБАНК              Оплата 
+//       Т: 32149782       М:211000230975 
+//       Mastercard        A0000000041010 
+//       Карта:(E1)      ****8666 
+//       Сумма (Руб):                6.00 
+//       Комиссия за операцию - 0 Руб. 
+//                   ОДОБРЕНО 
+//       К/А: 247317  RRN:   423312040409 
+//       Подпись клиента не требуется   
+//       EC3CCAE1066D400B7A3A350C69F28167 
+//       ================================ 
+//       ~S           IT услуги             
+//       Ростов-на-Дону, Ростовская облас 
+//       ул. Металлургическая, зд 102/2  
+//               т. 79044478621          
+//       20.08.24     16:17    ЧЕК   0002 
+//       ПАО СБЕРБАНК              Оплата 
+//       Т: 32149782       М:211000230975 
+//       Mastercard        A0000000041010 
+//       Карта:(E1)      ****8666 
+//       Сумма (Руб):                6.00 
+//       Комиссия за операцию - 0 Руб. 
+//                   ОДОБРЕНО 
+//       К/А: 247317  RRN:   423312040409 
+//       Подпись клиента не требуется   
+//       EC3CCAE1066D400B7A3A350C69F28167 
+//       ================================ 
+//       ~S
+//       """;
