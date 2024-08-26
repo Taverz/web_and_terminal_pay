@@ -95,6 +95,52 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     _selectPaymentMethod = _paymentMethods![index];
   }
 
+  ///  ## Привер обработки этого метода  
+  ///   
+  ///   * ------
+  /// 
+  ///   ```
+  ///   final paymentStatusEntity = await paymentSystem.pay(
+  ///     paymentModel,
+  ///     organizationsSelect: organizationsSelect,
+  ///   );
+  ///   state = const PaymentState.loadingAfterPay();
+  ///   if (paymentStatusEntity == PaymentStatusOperationEntity.success) {
+  ///     state = const PaymentState.success();
+  ///     return;
+  ///   }
+  ///   if ((paymentStatusEntity == PaymentStatusOperationEntity.start)) {
+  ///     return;
+  ///   }
+  ///   if ((paymentStatusEntity == PaymentStatusOperationEntity.noMoney)) {
+  ///     state = const PaymentState.unsuccess(
+  ///       'Ошибка службы и кассы! Обратитесь к менеджеру для возврата средств.',
+  ///     );
+  ///     return;
+  ///   }
+  ///   if ((paymentStatusEntity == PaymentStatusOperationEntity.cancel)) {
+  ///     state = const PaymentState.unsuccess(
+  ///       'Ошибка службы и кассы! Обратитесь к менеджеру для возврата средств.',
+  ///     );
+  ///     return;
+  ///   }
+  ///   if (!(paymentStatusEntity == PaymentStatusOperationEntity.success)) {
+  ///     for (final _ in [0, 1, 2]) {
+  ///       await Future.delayed(const Duration(seconds: 15));
+  ///       final paymentStatusEntity = await paymentSystem.statusPay();
+  ///       if (paymentStatusEntity == PaymentStatusOperationEntity.success) {
+  ///         state = const PaymentState.success();
+  ///         return;
+  ///       }
+  ///     }
+  ///     state = const PaymentState.unsuccess(
+  ///       'Ошибка службы и кассы! Обратитесь к менеджеру для возврата средств.',
+  ///     );
+  ///     return;
+  ///   }
+  /// ```
+  /// * -------
+  /// 
   @override
   Future<PaymentStatusOperationEntity> pay(
     PayEntity paymentModel, {
