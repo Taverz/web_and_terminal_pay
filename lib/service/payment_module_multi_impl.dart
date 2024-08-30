@@ -71,6 +71,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         'no contains methods pay, pless run init() from load method pay',
       );
     }
+
     /// Закоментировано поттому что выполняется при иницализации
     ///
     // List<PaymentMethodEntity> paymentMethods = [
@@ -95,10 +96,10 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
     _selectPaymentMethod = _paymentMethods![index];
   }
 
-  ///  ## Привер обработки этого метода  
-  ///   
+  ///  ## Привер обработки этого метода
+  ///
   ///   * ------
-  /// 
+  ///
   ///   ```
   ///   final paymentStatusEntity = await paymentSystem.pay(
   ///     paymentModel,
@@ -140,7 +141,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
   ///   }
   /// ```
   /// * -------
-  /// 
+  ///
   @override
   Future<PaymentStatusOperationEntity> pay(
     PayEntity paymentModel, {
@@ -161,12 +162,15 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
       final resultSuccess = (await _paymentOperation!
           .valueOrCancellation(PaymentStatusOperationEntity.cancel))!;
       if (resultSuccess == PaymentStatusOperationEntity.success) {
-        await transactionsSumSaveRepository
-            .plusSumTransactionPay(paymentModel.amountFull);
+        try {
+          await transactionsSumSaveRepository
+              .plusSumTransactionPay(paymentModel.amountFull);
+        } catch (e) {}
+
+        return resultSuccess;
       } else {
         return resultSuccess;
       }
-      return PaymentStatusOperationEntity.error;
     } catch (e) {
       // TODO: Save Failure operation
       return PaymentStatusOperationEntity.error;
@@ -191,7 +195,7 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         }
         final status =
             PaymentStatusOperationEntity.convertTerminal_StringToEnum(
-          result.statusText,
+          result.success ? 'оплачено' : result.statusText,
         );
         if (status == PaymentStatusOperationEntity.error) {
           await _errorPayNotification(status);
@@ -331,7 +335,9 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
         final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
         final dateTime =
             DateTime.now().toIso8601String().replaceFirst('T', ' ');
-        final titleStatus = status == PaymentStatusOperationEntity.error ? "🆘 <Ошибка оплаты> 🆘" : "❔ <Проверка статуса оплаты> ❔";
+        final titleStatus = status == PaymentStatusOperationEntity.error
+            ? "🆘 <Ошибка оплаты> 🆘"
+            : "❔ <Проверка статуса оплаты> ❔";
         final textMessage =
             " Сумма оплаты: ${_paymentModel?.amountFull}  \n Предметы оплаты: \n${_paymentModel?.items.map((e) => " \n " + e.name + " Количество: " + e.quantity.toString() + " Цена за штю.: " + e.price.toString() + '\n')}  \n ";
         final text =
@@ -392,37 +398,37 @@ class PaySystemWebAndTerminal implements PaymentSystemMulti {
 }
 
 // final resultExampleCloseShit = """
-//       IT услуги             
-//       Ростов-на-Дону, Ростовская облас 
-//       ул. Металлургическая, зд 102/2  
-//               т. 79044478621          
-//       20.08.24     16:17    ЧЕК   0002 
-//       ПАО СБЕРБАНК              Оплата 
-//       Т: 32149782       М:211000230975 
-//       Mastercard        A0000000041010 
-//       Карта:(E1)      ****8666 
-//       Сумма (Руб):                6.00 
-//       Комиссия за операцию - 0 Руб. 
-//                   ОДОБРЕНО 
-//       К/А: 247317  RRN:   423312040409 
-//       Подпись клиента не требуется   
-//       EC3CCAE1066D400B7A3A350C69F28167 
-//       ================================ 
-//       ~S           IT услуги             
-//       Ростов-на-Дону, Ростовская облас 
-//       ул. Металлургическая, зд 102/2  
-//               т. 79044478621          
-//       20.08.24     16:17    ЧЕК   0002 
-//       ПАО СБЕРБАНК              Оплата 
-//       Т: 32149782       М:211000230975 
-//       Mastercard        A0000000041010 
-//       Карта:(E1)      ****8666 
-//       Сумма (Руб):                6.00 
-//       Комиссия за операцию - 0 Руб. 
-//                   ОДОБРЕНО 
-//       К/А: 247317  RRN:   423312040409 
-//       Подпись клиента не требуется   
-//       EC3CCAE1066D400B7A3A350C69F28167 
-//       ================================ 
+//       IT услуги
+//       Ростов-на-Дону, Ростовская облас
+//       ул. Металлургическая, зд 102/2
+//               т. 79044478621
+//       20.08.24     16:17    ЧЕК   0002
+//       ПАО СБЕРБАНК              Оплата
+//       Т: 32149782       М:211000230975
+//       Mastercard        A0000000041010
+//       Карта:(E1)      ****8666
+//       Сумма (Руб):                6.00
+//       Комиссия за операцию - 0 Руб.
+//                   ОДОБРЕНО
+//       К/А: 247317  RRN:   423312040409
+//       Подпись клиента не требуется
+//       EC3CCAE1066D400B7A3A350C69F28167
+//       ================================
+//       ~S           IT услуги
+//       Ростов-на-Дону, Ростовская облас
+//       ул. Металлургическая, зд 102/2
+//               т. 79044478621
+//       20.08.24     16:17    ЧЕК   0002
+//       ПАО СБЕРБАНК              Оплата
+//       Т: 32149782       М:211000230975
+//       Mastercard        A0000000041010
+//       Карта:(E1)      ****8666
+//       Сумма (Руб):                6.00
+//       Комиссия за операцию - 0 Руб.
+//                   ОДОБРЕНО
+//       К/А: 247317  RRN:   423312040409
+//       Подпись клиента не требуется
+//       EC3CCAE1066D400B7A3A350C69F28167
+//       ================================
 //       ~S
 //       """;
