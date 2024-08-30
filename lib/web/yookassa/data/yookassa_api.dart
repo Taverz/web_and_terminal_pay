@@ -11,25 +11,31 @@ class YooKassaApi {
   late Dio dio;
 
   YooKassaApi({
-    required Dio dio,
-    required String username,
-    required String password,
+    required Dio dioW,
   }) {
     {
       final options = BaseOptions(
         baseUrl: ParameterYookassaApi.host,
         connectTimeout: const Duration(seconds: 15),
-        headers: {
-          "Authorization":
-              'Basic ${base64Encode(utf8.encode('$username:$password'))}'
-        },
       );
-      dio = Dio(options);
+      dioW.options = options;
+      dio = dioW;
     }
   }
 
-  Future<Map<String, dynamic>> getHostPayment(
-      {required String username, required String password}) async {
+  void setParams({
+    required String username,
+    required String password,
+  }) {
+    dio.options = dio.options.copyWith(
+      headers: {
+        "Authorization":
+            'Basic ${base64Encode(utf8.encode('$username:$password'))}'
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> getHostPayment() async {
     try {
       final response = await dio.get(
         'me',

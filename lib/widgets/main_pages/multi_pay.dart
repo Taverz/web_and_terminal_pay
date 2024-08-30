@@ -1,17 +1,23 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/atol_service.dart';
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/check_save_repository.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/check_save_repository.dart';
+import 'package:web_and_terminal_pay/crud/sharedpreference/crud_shared_preference.dart';
+import 'package:web_and_terminal_pay/data/local_sum_transaction.dart';
 import 'package:web_and_terminal_pay/pos/data/pos_local_db_impl.dart';
+import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
+import 'package:web_and_terminal_pay/service/model/pos_settings_model.dart';
 
 import 'package:web_and_terminal_pay/service/payment_module_multi.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
 import 'package:web_and_terminal_pay/pos/sber_termianl_kozen_p12/payment_sber_terminal_kozen_p12.dart';
 import 'package:web_and_terminal_pay/service/payment_module_multi_impl.dart';
+import 'package:web_and_terminal_pay/telegram_message/api_telegram.dart';
+import 'package:web_and_terminal_pay/telegram_message/repository_telegram.dart';
 import 'package:web_and_terminal_pay/web/yookassa/model/current_session_yookassa.dart';
 import 'package:web_and_terminal_pay/web/yookassa/repository/yookassa_repository.dart';
-import 'package:web_and_terminal_pay/web/yookassa/repository/local_save_yookassa.dart';
+import 'package:web_and_terminal_pay/web/yookassa/data/local_save_yookassa.dart';
 import 'package:web_and_terminal_pay/web/yookassa/data/yookassa_api.dart';
 import 'package:web_and_terminal_pay/widgets/action_button_with_state.dart';
 import 'package:web_and_terminal_pay/widgets/check_atol/check_session_page.dart';
@@ -33,21 +39,54 @@ class _MultiPaymentPageState extends State<MultiPaymentPage> {
 
   @override
   void initState() {
+    final dio = Dio();
     paymentSystemMulti = PaySystemWebAndTerminal(
       payTerminal: PaymentSberTerminalKozenP12(
-        sberLocalDB: SberLocalDB(),
+        posSettingsModel: PosSettingsModel(
+          terminalIP: '198.165.0.100',
+          terminalPort: 8888,
+        ),
+        sberLocalDB: SberLocalDB(
+          SharedPreferencesCRUD(),
+          SharedPreferencesCRUD(),
+          SharedPreferencesCRUD(),
+        ),
       ),
       payYookassa: YookassaRepository(
         YooKassaApi(
-          dio: Dio(),
-          username: id,
-          password: token,
+          dioW: dio,
         ),
         CurrentSessionYookassa(),
         YookassaSaveRepository(),
+        [
+          OrganizationYookassa(
+            id: 1,
+            name: 'ИП ААААА',
+            id_api: '123412',
+            token_api: 'live_d23d2d0jsa',
+          ),
+          OrganizationYookassa(
+            id: 2,
+            name: 'ООО ЮСС',
+            id_api: '123412',
+            token_api: 'live_d23d2d0jsa',
+          ),
+          OrganizationYookassa(
+            id: 3,
+            name: 'ИП МММММ',
+            id_api: '123412',
+            token_api: 'live_d23d2d0jsa',
+          ),
+        ],
       ),
       atolCheckService: AtolCheckService(
         CheckSaveRepository(),
+      ),
+      repositoryTelegram: RepositoryTelegram(
+        ApiTelegram(dio, null),
+      ),
+      transactionsSumSaveRepository: TransactionsSumSaveRepository(
+        SharedPreferencesCRUD(),
       ),
     );
     super.initState();
@@ -180,7 +219,7 @@ class _MultiPaymentPageState extends State<MultiPaymentPage> {
         if (payModel != null && payModel is PayEntity) {
           setState(() {});
           final result = await paymentSystemMulti.pay(payModel);
-          if (!result) {
+          if (!(result == PaymentStatusOperationEntity.success)) {
             throw Exception('Оплата прошла не успешно');
           }
           return 'Успешно, Создание оплаты';

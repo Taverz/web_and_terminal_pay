@@ -1,6 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+
+import 'package:atol_online_dart/atol_online_v1_4/model/check_atol_entity.dart';
 import 'package:collection/collection.dart';
-import 'package:web_and_terminal_pay/pos/model/pay/send/send_pos_payment_model.dart';
+import 'package:web_and_terminal_pay/service/entity/enum_payment_object_check.dart';
+// import 'package:web_and_terminal_pay/service/entity/payment_methods.dart';
 
 class PayEntity {
   final String idTransaction;
@@ -9,8 +13,9 @@ class PayEntity {
   final double amountFull;
   final String? emailClient;
   final String? phoneClient;
-  final String callbackUrl;
+  final String? callbackUrl;
   final String? descriptionPay;
+  // final PaymentMethodEntity methodPay;
   final List<ItemListModelSS> items;
   PayEntity({
     required this.idTransaction,
@@ -128,7 +133,6 @@ class ItemCheck {
   String name;
   double price;
   double quantity;
-  // double sum;
   String measurementUnit;
   PaymentObjectCheck paymentObjectCheck;
   ItemCheck({
@@ -172,7 +176,8 @@ class ItemCheck {
       quantity: map['quantity'] as double,
       measurementUnit: map['measurementUnit'] as String,
       paymentObjectCheck:
-          PaymentObjectCheck.fromString(map['paymentObjectCheck'] as String)!,
+          PaymentObjectCheck.from(map['paymentObjectCheck'] as String) ??
+              PaymentObjectCheck.service,
     );
   }
 
@@ -204,148 +209,5 @@ class ItemCheck {
         quantity.hashCode ^
         measurementUnit.hashCode ^
         paymentObjectCheck.hashCode;
-  }
-}
-
-enum PaymentObjectCheck {
-  commodity,
-  excise,
-  job,
-  service,
-  gamblingBet,
-  gamblingPrize,
-  lottery,
-  lotteryPrize,
-  intellectualActivity,
-  payment,
-  agentCommission,
-  composite,
-  another;
-
-  static PaymentObjectCheck? fromString(String value) {
-    switch (value) {
-      case 'commodity':
-        return PaymentObjectCheck.commodity;
-      case 'excise':
-        return PaymentObjectCheck.excise;
-      case 'job':
-        return PaymentObjectCheck.job;
-      case 'service':
-        return PaymentObjectCheck.service;
-      case 'gambling_bet':
-        return PaymentObjectCheck.gamblingBet;
-      case 'gambling_prize':
-        return PaymentObjectCheck.gamblingPrize;
-      case 'lottery':
-        return PaymentObjectCheck.lottery;
-      case 'lottery_prize':
-        return PaymentObjectCheck.lotteryPrize;
-      case 'intellectual_activity':
-        return PaymentObjectCheck.intellectualActivity;
-      case 'payment':
-        return PaymentObjectCheck.payment;
-      case 'agent_commission':
-        return PaymentObjectCheck.agentCommission;
-      case 'composite':
-        return PaymentObjectCheck.composite;
-      case 'another':
-        return PaymentObjectCheck.another;
-      default:
-        return null;
-    }
-  }
-
-  static PaymentObjectCheck? from(String value) {
-    switch (value) {
-      case 'commodity':
-        return PaymentObjectCheck.commodity;
-      case 'excise':
-        return PaymentObjectCheck.excise;
-      case 'job':
-        return PaymentObjectCheck.job;
-      case 'service':
-        return PaymentObjectCheck.service;
-      case 'gambling_bet':
-        return PaymentObjectCheck.gamblingBet;
-      case 'gambling_prize':
-        return PaymentObjectCheck.gamblingPrize;
-      case 'lottery':
-        return PaymentObjectCheck.lottery;
-      case 'lottery_prize':
-        return PaymentObjectCheck.lotteryPrize;
-      case 'intellectual_activity':
-        return PaymentObjectCheck.intellectualActivity;
-      case 'payment':
-        return PaymentObjectCheck.payment;
-      case 'agent_commission':
-        return PaymentObjectCheck.agentCommission;
-      case 'composite':
-        return PaymentObjectCheck.composite;
-      case 'another':
-        return PaymentObjectCheck.another;
-      default:
-        return null;
-    }
-  }
-}
-
-extension PaymentObjectExtension on PaymentObjectCheck {
-  String get totext {
-    switch (this) {
-      case PaymentObjectCheck.commodity:
-        return 'commodity';
-      case PaymentObjectCheck.excise:
-        return 'excise';
-      case PaymentObjectCheck.job:
-        return 'job';
-      case PaymentObjectCheck.service:
-        return 'service';
-      case PaymentObjectCheck.gamblingBet:
-        return 'gambling_bet';
-      case PaymentObjectCheck.gamblingPrize:
-        return 'gambling_prize';
-      case PaymentObjectCheck.lottery:
-        return 'lottery';
-      case PaymentObjectCheck.lotteryPrize:
-        return 'lottery_prize';
-      case PaymentObjectCheck.intellectualActivity:
-        return 'intellectual_activity';
-      case PaymentObjectCheck.payment:
-        return 'payment';
-      case PaymentObjectCheck.agentCommission:
-        return 'agent_commission';
-      case PaymentObjectCheck.composite:
-        return 'composite';
-      case PaymentObjectCheck.another:
-        return 'another';
-    }
-  }
-}
-
-extension PayEntityAtolSbertermianlExt on PayEntity {
-  SendPosPaymentModel payModelSberTerminal() => SendPosPaymentModel(
-        clientId: clientId,
-        idempotenceKeyERN: idempotenceKey,
-        amount: amountFull,
-      );
-  ModelSS checkModelAtol() {
-    final List<ItemCheck> itemsCheck = items.map((item) {
-      return ItemCheck(
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        measurementUnit: item.measurementUnit,
-        paymentObjectCheck:
-            PaymentObjectCheck.fromString(item.paymentObject.totext)!,
-      );
-    }).toList();
-
-    return ModelSS(
-      idempotenceKeyERN: idempotenceKey,
-      emailClient: emailClient,
-      phoneClient: phoneClient,
-      callbackUrl: callbackUrl,
-      items: itemsCheck.map((e) => ItemListModelSS.from(e.toMap())).toList(),
-    );
   }
 }

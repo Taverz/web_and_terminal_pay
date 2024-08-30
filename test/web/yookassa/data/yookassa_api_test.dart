@@ -39,8 +39,6 @@ void main() {
     mockDio = MockDio();
     api = YooKassaApi(
       dio: mockDio,
-      username: '231523',
-      password: 'dsfn0m328230z2x',
     );
     api.dio = mockDio;
   });

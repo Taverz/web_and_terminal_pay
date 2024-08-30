@@ -14,10 +14,14 @@ import 'package:web_and_terminal_pay/service/model/pos_settings_model.dart';
 class PaymentSberTerminalKozenP12 implements PayTerminal {
   final PosOperationDB sberLocalDB;
   final PosMapper mapper;
+  final PosSettingsModel posSettingsModel;
   late final POSPaymentModule posModule;
+  final List<OrganizationPosTerminalSber>? organizations;
   PaymentSberTerminalKozenP12({
     required this.sberLocalDB,
     this.mapper = const PosMapper(),
+    required this.posSettingsModel,
+    this.organizations,
   });
 
   CurrentOperation _currentOperation = CurrentOperation.empty();
@@ -27,10 +31,11 @@ class PaymentSberTerminalKozenP12 implements PayTerminal {
 
   @override
   Future<void> init() async {
-    final settingsModel = await sberLocalDB.getSettingsTerminal();
-    if (settingsModel == null) {
-      throw Exception('No settings');
-    }
+    final settingsModel =
+        posSettingsModel; //await sberLocalDB.getSettingsTerminal();
+    // if (settingsModel == null) {
+    //   throw Exception('No settings');
+    // }
     posModule = POSPaymentModule(
       ip: settingsModel.terminalIP,
       port: settingsModel.terminalPort,
@@ -153,11 +158,17 @@ class PaymentSberTerminalKozenP12 implements PayTerminal {
     if (!(paymentModel is SendPosPaymentModel)) {
       throw Exception(' paymentModel должен быть тип SendPosPaymentModel ');
     }
+    // if (posModule != null) {
+    //   throw Exception(' posModule no init ');
+    // }
     await connect();
     paymentModel = (paymentModel as SendPosPaymentModel);
+    final idempotKey = paymentModel.idempotenceKeyERN;
+    final idempotenceKey =
+        idempotKey.length > 9 ? idempotKey.substring(0, 8) : idempotKey;
     _currentOperation = _currentOperation.copyWith(
       currentClientId: paymentModel.clientId,
-      idempotenceKeyERN: paymentModel.idempotenceKeyERN,
+      idempotenceKeyERN: idempotenceKey,
       amount: paymentModel.amount,
     );
 
@@ -166,34 +177,49 @@ class PaymentSberTerminalKozenP12 implements PayTerminal {
         .createPayment(
           amount: paymentModel.amount,
           clientId: paymentModel.clientId,
-          idempotenceKeyERN: paymentModel.idempotenceKeyERN,
+          idempotenceKeyERN: idempotenceKey,
           organizationCode: _currentOperation.selectOrganization?.number,
         )
         .timeout(const Duration(minutes: 5));
     _currentOperation = _currentOperation.copyWith(
       retrievalReferenceNumber: resultCreatePay.retrievalReferenceNumber,
     );
+
+    // final convertStringTiEnumStatus = PaymentStatusOperationEntity.convertTerminal_StringToEnum();
+    //  if (paymentStatusEntity == PaymentStatusOperationEntity.error) {
+    //     return TODO: check status 3;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.start)) {
+    //     return TODO: check status 1;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.noMoney)) {
+    //     return TODO: check status 1;
+    //   }
+    //   if ((paymentStatusEntity == PaymentStatusOperationEntity.cancel)) {
+    //     return TODO: check status 1;
+    //   }
     await sberLocalDB.saveTransaction(
       mapCurrentCheck: TransactionTerminal(
         request: (paymentModel as SendPosPaymentModel),
         result: resultCreatePay,
         checkCalled: false,
         createAtUTC: DateTime.now().toUtc(),
-        idTransactionString: paymentModel.idempotenceKeyERN,
+        idTransactionString: idempotenceKey,
         payCalled: false,
         refundCalled: false,
         sumFull: paymentModel.amount,
         transactionType: TransactionType.paySuccessAfterCheck,
       ),
-      idCheck: _currentOperation.idempotenceKeyERN,
+      idCheck: idempotenceKey,
     );
 
     await disconnect();
     return GetPosPaymentModel(
       clientId: resultCreatePay.clientId,
-      idempotenceKeyERN: resultCreatePay.idempotenceKeyERN,
+      idempotenceKeyERN: idempotenceKey,
       success: resultCreatePay.success,
       receipt: resultCreatePay.receipt,
+      statusText: resultCreatePay.statusText,
       amount: resultCreatePay.amount,
       rrn: resultCreatePay.retrievalReferenceNumber,
       dateTime: mapper.convertPosToDateTime(

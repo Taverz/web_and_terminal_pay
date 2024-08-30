@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:web_and_terminal_pay/crud/crud.dart';
 import 'package:web_and_terminal_pay/pos/data/pos_local_db.dart';
 import 'package:web_and_terminal_pay/service/model/transaction_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,18 +14,26 @@ class SberLocalDB implements PosOperationDB {
   final String _keyOrganizationSberShared = 'sber_organization_shared';
   final String _keyCheckShared = 'sber_refund_shared';
 
-  SharedPreferences? sharedInit;
+  // SharedPreferences? sharedInit;
+  final CRUDInterface sberSettings;
+  final CRUDInterface organizationSber;
+  final CRUDInterface checkSber;
+
+  SberLocalDB(
+    this.sberSettings,
+    this.organizationSber,
+    this.checkSber,
+  );
 
   Future<void> init() async {
-    final shared = await SharedPreferences.getInstance();
-    sharedInit = shared;
+    await sberSettings.init(_keySettingsSberShared);
+    await organizationSber.init(_keyOrganizationSberShared);
+    await checkSber.init(_keyCheckShared);
   }
 
   @override
   Future<bool> saveSettingsTerminal(PosSettingsModel model) async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setString(
-      _keySettingsSberShared,
+    await sberSettings.setParameter(
       jsonEncode(model.toJson()),
     );
     return true;
@@ -32,57 +41,50 @@ class SberLocalDB implements PosOperationDB {
 
   @override
   Future<PosSettingsModel?> getSettingsTerminal() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final data = sharedPreferences.getString(_keySettingsSberShared);
-    if (data == null) {
+    final data = await sberSettings.getAllMap();
+    if (data.isEmpty) {
       return null;
     }
-    return PosSettingsModel.fromJson(jsonDecode(data));
+    return PosSettingsModel.fromJson(data);
   }
 
   @override
   Future<bool> deleteSettingsTerminal() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.remove(_keySettingsSberShared);
+    await sberSettings.deleteMap();
     return true;
   }
 
   @override
   Future<bool> deleteAllOrganization() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.remove(_keyOrganizationSberShared);
+    await organizationSber.deleteMap();
     return true;
   }
 
   @override
   Future<List<OrganizationPosTerminalSber>?> getAllOrganization() async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final data = sharedPreferences.getString(_keyOrganizationSberShared);
-    if (data == null) {
+    final data = await organizationSber.getAllList();
+    if (data.isEmpty) {
       return null;
     }
-    final List<dynamic> jsonList = jsonDecode(data);
-    return jsonList
-        .map((json) => OrganizationPosTerminalSber.fromJson(json))
+    return data
+        .map((value) => OrganizationPosTerminalSber.fromJson(value))
         .toList();
   }
 
   @override
   Future<bool> saveNewOrganization(OrganizationPosTerminalSber model) async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    final data = sharedPreferences.getString(_keyOrganizationSberShared);
+    final data = await organizationSber.getAllList();
     List<OrganizationPosTerminalSber> organizations = [];
-    if (data != null) {
-      final List<dynamic> jsonList = jsonDecode(data);
+    if (data.isNotEmpty) {
+      final List<dynamic> jsonList = data;
       organizations = jsonList
           .map((json) => OrganizationPosTerminalSber.fromJson(json))
           .toList();
     }
     final organizationsSet = organizations.toSet();
     organizationsSet.add(model);
-    await sharedPreferences.setString(
-      _keyOrganizationSberShared,
-      jsonEncode(organizationsSet.map((org) => org.toJson()).toList()),
+    await organizationSber.updateList(
+      organizationsSet.map((org) => org.toJson()).toList(),
     );
     return true;
   }

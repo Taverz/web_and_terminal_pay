@@ -8,14 +8,14 @@ abstract class CRUDInterface {
   Future<void> updateList(List<dynamic> value);
 
   Future<void> deleteElementFromList(dynamic element);
-  Future<void> deleteElementFromMap(String mapKey);
+  Future<void> deleteMap();
 
-  Future<dynamic> getElementFromMap(String mapKey);
+  Future<dynamic> getElementFromMap();
   Future<dynamic> getElementFromList(int index);
 
   Future<List<dynamic>> getAllList();
   Future<Map<String, dynamic>> getAllMap();
 
-  Future<void> setParameter(String key, dynamic value);
-  Future<dynamic> getParameter(String key);
+  Future<void> setParameter(dynamic value);
+  Future<dynamic> getParameter();
 }

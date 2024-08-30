@@ -1,17 +1,22 @@
-import 'package:web_and_terminal_pay/check_service/atol/recipe/sss/atol_service.dart';
+import 'package:web_and_terminal_pay/check_service/atol/recipe/atol_service.dart';
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
+import 'package:web_and_terminal_pay/service/entity/extension_pay_sber.dart';
 import 'package:web_and_terminal_pay/service/entity/pay_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/payment_methods.dart';
+import 'package:web_and_terminal_pay/service/entity/payment_status_operation_entity.dart';
 import 'package:web_and_terminal_pay/service/entity/transaction_history.dart';
 import 'package:web_and_terminal_pay/service/payment_module_single.dart';
+import 'package:web_and_terminal_pay/telegram_message/repository_telegram.dart';
 
 class PaySystemTerminal implements PaymentSystemSingle {
   // PaymentSberTerminalKozenP12
   final PayTerminal payTerminal;
   final AtolCheckService atolCheckService;
+  final RepositoryTelegram repositoryTelegram;
   PaySystemTerminal({
     required this.payTerminal,
     required this.atolCheckService,
+    required this.repositoryTelegram,
   });
 
   PayEntity? _paymentModel;
@@ -20,9 +25,10 @@ class PaySystemTerminal implements PaymentSystemSingle {
   PaymentMethodEntity? _selectPaymentMethod;
 
   @override
-  Future<void> init() async {
+  Future<void> init({String? Chat_ID}) async {
     _paymentModel = null;
     await payTerminal.init();
+    repositoryTelegram.initChatId(Chat_ID);
   }
 
   @override
@@ -35,11 +41,6 @@ class PaySystemTerminal implements PaymentSystemSingle {
   Future<void> close() async {
     _paymentModel = null;
     await payTerminal.close();
-  }
-
-  @override
-  Future<void> closingShift() async {
-    await payTerminal.reconciliationOfResults();
   }
 
   @override
@@ -64,13 +65,18 @@ class PaySystemTerminal implements PaymentSystemSingle {
   }
 
   @override
-  Future<void> pay(PayEntity paymentModel) async {
+  Future<PaymentStatusOperationEntity> pay(
+    PayEntity paymentModel, {
+    String? organizationsSelect,
+  }) async {
     _paymentModel = paymentModel;
     try {
       await payTerminal.createPay(_paymentModel!.payModelSberTerminal());
       await atolCheckService.check(_paymentModel!.checkModelAtol());
+      return PaymentStatusOperationEntity.success;
       //TODO: transaction save
     } catch (e) {
+      return PaymentStatusOperationEntity.error;
       //TODO: transaction save
     }
   }
@@ -99,5 +105,30 @@ class PaySystemTerminal implements PaymentSystemSingle {
       throw Exception('Empty list pay methods');
     }
     _selectPaymentMethod = _paymentMethods![index];
+  }
+
+  @override
+  Future<PaymentStatusOperationEntity> statusPay() async {
+    if (_paymentModel == null) {
+      throw Exception('No pay create');
+    }
+    final statusString = await payTerminal.checkStatusCurrentOperation();
+    final status =
+        PaymentStatusOperationEntity.convertTerminal_StringToEnum(statusString);
+    return status;
+  }
+
+  @override
+  Future<String?> closingShift() async {
+    if (repositoryTelegram.initChat) {
+      final result = await payTerminal.reconciliationOfResults();
+      final dateTimeUTC = DateTime.now().toUtc().toIso8601String();
+      final dateTime = DateTime.now().toIso8601String();
+      final text =
+          "\n <Сверка итогов> \n UTC date time: ${dateTimeUTC} \n LOCAL date time: ${dateTime} \n CHAT_reconciliationOfResults \n\n ${result}";
+      await repositoryTelegram.sendMessage(text);
+      return result;
+    }
+    return null;
   }
 }

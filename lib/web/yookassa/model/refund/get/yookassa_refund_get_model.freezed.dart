@@ -22,8 +22,7 @@ YookassaRefundGetModel _$YookassaRefundGetModelFromJson(
 /// @nodoc
 mixin _$YookassaRefundGetModel {
   String get id => throw _privateConstructorUsedError;
-  YookassaAmountModel get amount =>
-      throw _privateConstructorUsedError; // @JsonKey(name: 'created_at') required DateTime createdAt,
+  YookassaAmountModel get amount => throw _privateConstructorUsedError;
   @JsonKey(name: 'payment_id')
   String get paymentId => throw _privateConstructorUsedError;
   YookassaPayStatusEnum get status => throw _privateConstructorUsedError;
@@ -171,7 +170,6 @@ class _$YookassaRefundGetModelImpl implements _YookassaRefundGetModel {
   final String id;
   @override
   final YookassaAmountModel amount;
-// @JsonKey(name: 'created_at') required DateTime createdAt,
   @override
   @JsonKey(name: 'payment_id')
   final String paymentId;
@@ -229,7 +227,7 @@ abstract class _YookassaRefundGetModel implements YookassaRefundGetModel {
   String get id;
   @override
   YookassaAmountModel get amount;
-  @override // @JsonKey(name: 'created_at') required DateTime createdAt,
+  @override
   @JsonKey(name: 'payment_id')
   String get paymentId;
   @override

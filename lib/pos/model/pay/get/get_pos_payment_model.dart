@@ -10,6 +10,7 @@ abstract class GetPosPaymentModel with _$GetPosPaymentModel {
     required String idempotenceKeyERN,
     required bool success,
     required String? receipt,
+    required String? statusText,
     required double amount,
     required DateTime dateTime,
     required String? rrn,

@@ -31,6 +31,7 @@ class PosPaymentService {
     );
     await posModule.disconnect();
     return GetPosPaymentModel(
+      statusText: ss.statusText,
       clientId: ss.clientId,
       idempotenceKeyERN: ss.idempotenceKeyERN,
       success: ss.success,

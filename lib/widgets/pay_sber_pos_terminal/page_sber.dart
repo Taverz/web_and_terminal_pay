@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:web_and_terminal_pay/crud/sharedpreference/crud_shared_preference.dart';
 import 'package:web_and_terminal_pay/pos/data/pos_local_db_impl.dart';
 import 'package:web_and_terminal_pay/pos/pay_terminal.dart';
 import 'package:web_and_terminal_pay/pos/sber_termianl_kozen_p12/payment_sber_terminal_kozen_p12.dart';
@@ -23,7 +24,15 @@ class PayPageSberTestExample extends StatefulWidget {
 
 class _PayPageSberTestExampleState extends State<PayPageSberTestExample> {
   final PayTerminal payTerminal = PaymentSberTerminalKozenP12(
-    sberLocalDB: SberLocalDB(),
+    posSettingsModel: PosSettingsModel(
+      terminalIP: '198.165.0.100',
+      terminalPort: 8888,
+    ),
+    sberLocalDB: SberLocalDB(
+      SharedPreferencesCRUD(),
+      SharedPreferencesCRUD(),
+      SharedPreferencesCRUD(),
+    ),
   );
 
   @override
